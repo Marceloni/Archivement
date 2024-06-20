@@ -14,26 +14,31 @@
 </div>
 
 <style>
+
   .entry {
     background-color: #7e7e7e;
-    padding: 10px;
-    margin: 10px;
+    padding: 0.5rem;
+    margin: 0.5rem;
     border: 3px solid rgb(51, 51, 51);
     text-align: center;
-    width: 75%;
+    width: auto;
+    box-sizing: border-box;
   }
   .entry-title {
     margin: 0;
-    padding-bottom: 10px;
+    padding-bottom: 0.25rem;
+    margin-bottom: 0.5rem;
     border-bottom: 3px solid rgb(51, 51, 51);
   }
   .content-preview {
-    padding-top: 10px;
-    width: 100%;
+    margin: 0.25rem;
+    width: auto;
     display: grid;
+    justify-content: center;
+    align-items: center;
     grid-template-columns: repeat(4, 1fr);
     grid-template-rows: repeat(2, 1fr);
-    gap: 10px; /* Optional: Add space between the grid items */
+    gap: 0.25rem; /* Optional: Add space between the grid items */
   }
   .content-preview img {
     width: 100%;
@@ -49,15 +54,15 @@
     grid-row: 1 / 2;
   }
   .content-preview img:nth-child(3) {
-    grid-column: 3 / 4;
-    grid-row: 2 / 3;
-  }
-  .content-preview img:nth-child(4) {
     grid-column: 4 / 4;
     grid-row: 1 / 2;
   }
+  .content-preview img:nth-child(4) {
+    grid-column: 3 / 4;
+    grid-row: 2 / 2;
+  }
   .content-preview img:nth-child(5) {
     grid-column: 4 / 4;
-    grid-row: 2 / 3;
+    grid-row: 2 / 2;
   }
 </style>
