@@ -1,8 +1,10 @@
 <script lang="ts">
   import GoalInput from "../../components/goalInput.svelte";
-
+  let goals: GoalInput[] = []
   function addGoal() {
-    new GoalInput({target: document.getElementById("goals-list") as HTMLElement, anchor: document.getElementById("add-goal-button") as HTMLElement})
+    goals.forEach((goal) => {goal.$set({closable: false})})
+    const goalInstance = new GoalInput({target: document.getElementById("goals-list") as HTMLElement, anchor: document.getElementById("add-goal-button") as HTMLElement, props: {closable: true, onRemove: () => {goals.splice(goals.indexOf(goalInstance), 1); goals.at(-1)?.$set({closable: true})}}})
+    goals.push(goalInstance)
   }
 </script>
 
@@ -11,9 +13,11 @@
 
   <p>You can still edit these later</p>
   <div id="goals-list">
-    <GoalInput closable={false}></GoalInput>
+    <GoalInput></GoalInput>
     <button on:click={addGoal} id="add-goal-button"/>
   </div>
+
+  <textarea id="entry-description" placeholder="Description" maxlength=128/>
 
   <div id="footer">
     <button id="create-entry-button">Create Entry</button>
@@ -31,7 +35,16 @@
     text-align: center;
   }
 
+  #entry-description {
+    margin-top: 0.5rem;
+    font-family: inherit;
+    resize: none;
+    width: 20rem;
+    height: 3rem;
+  }
+
   #add-goal-button {
+    cursor: pointer;
     background-color: white;
     border: 3px solid black;
     background-image: url("src/assets/icons/plus.svg");
@@ -50,7 +63,7 @@
     display: flex;
     flex-direction: column;
   }
-  
+
   #footer {
     position: fixed;
     left: 0;

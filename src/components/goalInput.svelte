@@ -1,17 +1,17 @@
 <script lang="ts">
-  export let closable: Boolean = true;
+  export let closable: boolean = false;
   let input: HTMLDivElement;
+  export let onRemove: () => void = ()=>{};
 
   function removeGoal() {
+    onRemove();
     input.remove();
   }
 </script>
 
-<div bind:this={input} class={closable?"goal-input-div padded-goal-input-div":"goal-input-div"}>
+<div bind:this={input} class={closable?"goal-input-div goal-input-div-closable":"goal-input-div"}>
   <input class="goal-input" type="text" placeholder="Enter a Goal">
-  {#if closable}
-    <img on:click={removeGoal} class="remove-goal-button" src="src/assets/icons/close.svg" alt="Remove Goal">
-  {/if}
+  <img on:click={removeGoal} class={closable?"remove-goal-button button-closable":"remove-goal-button"} src="src/assets/icons/close.svg" alt="Remove Goal">
 </div>
 
 <style>
@@ -26,10 +26,14 @@
   }
 
   .remove-goal-button {
-    display: inline-block;
+    -webkit-user-select: none;
+    -webkit-user-drag: none;
+    cursor: pointer;
+    display: none;
     height: 100%;
     width: 3rem;
     height: 3rem;
+    filter: invert(1);
   }
 
   .goal-input {
@@ -38,7 +42,10 @@
     height: 2rem;
   }
 
-  .padded-goal-input-div {
+  .goal-input-div-closable {
     padding-left: 3rem;
+  }
+  .button-closable {
+    display: inline-block;
   }
 </style>
