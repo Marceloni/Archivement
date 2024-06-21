@@ -81,5 +81,8 @@
     border-style: solid;
     box-sizing: border-box;
     filter: invert(1);
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-user-drag: none;
   }
 </style>

@@ -26,6 +26,7 @@
   }
 
   .remove-goal-button {
+    user-select: none;
     -webkit-user-select: none;
     -webkit-user-drag: none;
     cursor: pointer;

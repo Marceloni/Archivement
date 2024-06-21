@@ -41,6 +41,9 @@
     gap: 0.25rem; /* Optional: Add space between the grid items */
   }
   .content-preview img {
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-user-drag: none;
     width: 100%;
     height: auto;
     display: block;
