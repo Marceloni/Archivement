@@ -1,7 +1,7 @@
 {
   "productName": "archivement",
   "version": "0.0.0",
-  "identifier": "com.tauri.dev",
+  "identifier": "com.marceloni.archivement",
   "build": {
     "beforeDevCommand": "npm run dev",
     "devUrl": "http://localhost:1420",
@@ -11,12 +11,14 @@
   "app": {
     "windows": [
       {
+        
         "title": "archivement",
         "width": 800,
         "height": 600
       }
     ],
     "security": {
+      "capabilities": [],
       "csp": null
     }
   },
