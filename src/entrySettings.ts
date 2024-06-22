@@ -1,4 +1,5 @@
 export default interface EntrySettings {
+    uuid: string;
     title: string;
     content: ContentPiece[]
     goals: Goal[]

@@ -4,6 +4,7 @@
   import { invoke } from "@tauri-apps/api/core"
   import Entry from "../components/entry.svelte"
   import type EntrySettings from "../entrySettings"
+  import {convertFileSrc} from "@tauri-apps/api/core"
   function addEntry() {
     goto("/create")
   }
