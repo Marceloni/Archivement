@@ -1,9 +1,20 @@
 <script lang="ts">
   import { goto } from "$app/navigation";
+  import { onMount } from 'svelte';
+  import { invoke } from "@tauri-apps/api/core"
   import Entry from "../components/entry.svelte"
+  import type EntrySettings from "../entrySettings"
   function addEntry() {
     goto("/create")
   }
+
+  onMount(async ()=>{
+    let settings_files: EntrySettings[] = await invoke("read_entries")
+    settings_files.forEach((settings) => {
+      new Entry({target: document.getElementById("entry-list") as HTMLElement, props: {settings}})
+    })
+  })
+  
 </script>
 
 <div id="home-page">
@@ -12,8 +23,7 @@
   <p>Archive your Achievements</p>
 
   <div id="entry-list">
-    <Entry title="Example Title"/>
-    <Entry title="Example Title"/>
+    
   </div>
 
   <div id="footer">

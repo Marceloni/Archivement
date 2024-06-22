@@ -1,15 +1,25 @@
 <script lang="ts">
-  export let title = ""
+  import type EntrySettings from "../entrySettings"
+  export let settings: EntrySettings
 </script>
 
 <div class="entry">
-  <h2 class="entry-title">{title}</h2>
+  <h2 class="entry-title">{settings.title}</h2>
   <div class="content-preview">
-    <img src="src/assets/example_image.jpg">
-    <img src="src/assets/example_image.jpg">
-    <img src="src/assets/example_image.jpg">
-    <img src="src/assets/example_image.jpg">
-    <img src="src/assets/example_image.jpg">
+    {#each settings.content as contentPiece}
+      {#if contentPiece.type === "image"}<img src={contentPiece.path} alt="Image">{/if}
+      {#if contentPiece.type === "text"}<p>{contentPiece.text}</p>{/if}
+      {#if contentPiece.type === "video"}
+        <video controls>
+          <source src={contentPiece.path} type="video/mp4">
+        </video>
+      {/if}
+      {#if contentPiece.type === "audio"}
+        <audio controls>
+          <source src={contentPiece.path} type="audio/mpeg">
+        </audio>
+      {/if}
+    {/each}
   </div>
 </div>
 

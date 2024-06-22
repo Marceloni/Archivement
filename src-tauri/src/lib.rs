@@ -21,12 +21,20 @@ fn create_entry(app: AppHandle, title: String, goals: Vec<String>, description: 
 struct EntrySettings {
     title: String,
     goals: Vec<Goal>,
+    content: Vec<ContentPiece>,
     description: String
 }
 #[derive(serde::Serialize, serde::Deserialize)]
 struct Goal {
     title: String,
     completed: bool
+}
+#[derive(serde::Serialize, serde::Deserialize)]
+struct ContentPiece {
+    r#type: String,
+    path: Option<String>,
+    text: Option<String>,
+    creation_date: i32
 }
 
 fn save_entry_settings(app: AppHandle, title: String, goals: Vec<Goal>, description: String) {
@@ -41,7 +49,7 @@ fn save_entry_settings(app: AppHandle, title: String, goals: Vec<Goal>, descript
     println!("{}", format!("Entry dir: {:?}", entry_dir));
     std::fs::create_dir_all(&entry_dir).expect("failed to create entry dir");
     
-    let entry_settings = EntrySettings {title, goals, description};
+    let entry_settings = EntrySettings {title, goals, content: Vec::new(), description};
     let entry_settings_path = entry_dir.join("settings.json");
     let entry_settings_json = serde_json::to_string_pretty(&entry_settings).expect("failed to serialize entry settings");
     std::fs::write(entry_settings_path, entry_settings_json).expect("failed to write entry settings");
