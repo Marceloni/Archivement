@@ -5,7 +5,7 @@ use uuid::Uuid;
 pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_shell::init())
-        .invoke_handler(tauri::generate_handler![create_entry, read_entries])
+        .invoke_handler(tauri::generate_handler![create_entry, read_entries, get_settings])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
@@ -73,4 +73,16 @@ fn read_entries(app: AppHandle) -> Vec<EntrySettings> {
         let entry_settings_json: EntrySettings = serde_json::from_str(&std::fs::read_to_string(entry_settings_path).expect("failed to read entry settings")).expect("failed to deserialize entry settings");
         return entry_settings_json;
     }).collect()
+}
+
+#[tauri::command]
+fn get_settings(app: AppHandle, uuid: String) -> EntrySettings {
+    let app_data_dir = app.path().app_data_dir().expect("failed to get app data dir");
+    let entries_dir = app_data_dir.join("entries");
+    if !entries_dir.exists() {std::fs::create_dir_all(&entries_dir).expect("failed to create entries dir");}
+
+    let entry_dir = entries_dir.join(uuid);
+    let entry_settings_path = entry_dir.join("settings.json");
+    let entry_settings_json: EntrySettings = serde_json::from_str(&std::fs::read_to_string(entry_settings_path).expect("failed to read entry settings")).expect("failed to deserialize entry settings");
+    return entry_settings_json;
 }

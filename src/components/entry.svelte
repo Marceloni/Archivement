@@ -3,10 +3,16 @@
   import type { EntrySettings, ContentPiece } from "../entrySettings"
   export let settings: EntrySettings
   import { appDataDir, join } from "@tauri-apps/api/path"
-  import { convertFileSrc } from "@tauri-apps/api/core"
+  import { convertFileSrc, invoke } from "@tauri-apps/api/core"
+  import { goto } from "$app/navigation";
+
+  async function openEntry() {
+    console.log("/entry_content/" + JSON.stringify(await invoke('get_settings', {uuid: settings.uuid})))
+    goto("/entry_content/" + JSON.stringify(await invoke('get_settings', {uuid: settings.uuid})))
+  }
 </script>
 
-<div class="entry">
+<div class="entry" on:click={openEntry}>
   <h2 class="entry-title">{settings.title}</h2>
   <div class="content-preview">
     {#each settings.content as contentPiece}
