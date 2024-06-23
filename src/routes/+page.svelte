@@ -3,15 +3,24 @@
   import { onMount } from 'svelte';
   import { invoke } from "@tauri-apps/api/core"
   import Entry from "../components/entry.svelte"
-  import type EntrySettings from "../entrySettings"
+  import type { EntrySettings } from "../entrySettings"
   import {convertFileSrc} from "@tauri-apps/api/core"
+  import { appDataDir, join } from "@tauri-apps/api/path";
   function addEntry() {
     goto("/create")
   }
 
   onMount(async ()=>{
     let settings_files: EntrySettings[] = await invoke("read_entries")
-    settings_files.forEach((settings) => {
+    settings_files.forEach(async (settings) => {
+      settings.content = await Promise.all(settings.content.map(async (contentPiece) => {
+      if (contentPiece.type === "image" || contentPiece.type === "video" || contentPiece.type === "audio") {
+        console.log(await convertFileSrc(await join(await appDataDir(), "entries", settings.uuid, "content", contentPiece.path as string)))
+        contentPiece.path = await convertFileSrc(await join(await appDataDir(), "entries", settings.uuid, "content", contentPiece.path as string))
+      }
+      return contentPiece
+      }))
+      
       new Entry({target: document.getElementById("entry-list") as HTMLElement, props: {settings}})
     })
   })

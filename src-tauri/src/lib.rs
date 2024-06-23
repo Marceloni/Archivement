@@ -49,6 +49,9 @@ fn save_entry_settings(app: AppHandle, title: String, goals: Vec<Goal>, descript
     let entry_dir = entries_dir.join(id.to_string());
     println!("{}", format!("Entry dir: {:?}", entry_dir));
     std::fs::create_dir_all(&entry_dir).expect("failed to create entry dir");
+
+    let content_dir = entry_dir.join("content");
+    if !content_dir.exists() {std::fs::create_dir_all(&content_dir).expect("failed to create content dir");}
     
     let entry_settings = EntrySettings {uuid: id.to_string(), title, goals, content: Vec::new(), description};
     let entry_settings_path = entry_dir.join("settings.json");

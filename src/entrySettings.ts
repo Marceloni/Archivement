@@ -1,4 +1,4 @@
-export default interface EntrySettings {
+export interface EntrySettings {
     uuid: string;
     title: string;
     content: ContentPiece[]

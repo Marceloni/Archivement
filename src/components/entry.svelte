@@ -1,6 +1,9 @@
 <script lang="ts">
-  import type EntrySettings from "../entrySettings"
+  import { onMount } from "svelte";
+  import type { EntrySettings, ContentPiece } from "../entrySettings"
   export let settings: EntrySettings
+  import { appDataDir, join } from "@tauri-apps/api/path"
+  import { convertFileSrc } from "@tauri-apps/api/core"
 </script>
 
 <div class="entry">
@@ -50,13 +53,18 @@
     grid-template-rows: repeat(2, 1fr);
     gap: 0.25rem; /* Optional: Add space between the grid items */
   }
-  .content-preview img {
+  .content-preview img, .content-preview video {
     user-select: none;
     -webkit-user-select: none;
     -webkit-user-drag: none;
     width: 100%;
     height: auto;
-    display: block;
+  }
+  .content-preview audio{
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-user-drag: none;
+    width: 100%;
   }
   .content-preview img:nth-child(1) {
     grid-column: 1 / 3; /* Span 2 columns */
