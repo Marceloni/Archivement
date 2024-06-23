@@ -1,3 +1,3 @@
-package com.tauri.dev
+package com.marceloni.archivement
 
 class MainActivity : TauriActivity()
