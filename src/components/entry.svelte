@@ -1,14 +1,11 @@
 <script lang="ts">
-  import { onMount } from "svelte";
-  import type { EntrySettings, ContentPiece } from "../entrySettings"
+  import type { EntrySettings } from "../entrySettings"
   export let settings: EntrySettings
-  import { appDataDir, join } from "@tauri-apps/api/path"
-  import { convertFileSrc, invoke } from "@tauri-apps/api/core"
+  import { invoke } from "@tauri-apps/api/core"
   import { goto } from "$app/navigation";
 
   async function openEntry() {
-    console.log("/entry_content/" + JSON.stringify(await invoke('get_settings', {uuid: settings.uuid})))
-    goto("/entry_content/" + JSON.stringify(await invoke('get_settings', {uuid: settings.uuid})))
+    goto("/entry_content/" + encodeURIComponent(JSON.stringify(settings)))
   }
 </script>
 
@@ -33,7 +30,6 @@
 </div>
 
 <style>
-
   .entry {
     background-color: #7e7e7e;
     padding: 0.5rem;
