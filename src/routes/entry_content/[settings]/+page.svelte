@@ -47,6 +47,11 @@
     function openAddContentDropdown() {
         addContentDropdownShown = !addContentDropdownShown
     }
+
+    function addContentPiece(event: MouseEvent) {
+        let target = event.target as HTMLElement
+        invoke("add_content_piece", {uuid: settings.uuid, type: target.dataset.type})
+    }
   </script>
   <div id="content-edit-page">
       <h1 id="entry-title">{settings.title}</h1>
@@ -85,31 +90,33 @@
       </div>
       <div id="footer">
         <img id="add-content-button" src="../src/assets/icons/plus.svg" on:click={openAddContentDropdown}>
-        <div id="add-content-dropdown" class={addContentDropdownShown?"show":""}>
-            <a href="#">Text</a>
-            <a href="#">Image</a>
-            <a href="#">Video</a>
-            <a href="#">Audio</a>
+        <div id="add-content-dropdown" class={addContentDropdownShown?"show":""} on:click={addContentPiece}>
+            <p data-type="text">Text</p>
+            <p data-type="image">Image</p>
+            <p data-type="video">Video</p>
+            <p data-type="audio">Audio</p>
           </div>
       </div>
   </div>
   <style>
     #add-content-dropdown {
         display: none;
-        position: absolute;
         background-color: rgb(110, 110, 110);
+        margin-bottom: 3.5rem;
+        position: absolute;
         width: 5rem;
-        margin-bottom: 14rem;
         z-index: 1;
+        align-self: end;
     }
 
-    #add-content-dropdown a {
+    #add-content-dropdown p {
+        cursor: pointer;
         color: inherit;
         padding: 0.5rem 0.5rem;
         text-decoration: none;
         display: block;
     }
-    #add-content-dropdown a:hover {
+    #add-content-dropdown p:hover {
         background-color: rgb(66, 66, 66);
     }
     .show {display:block !important;}
@@ -163,31 +170,31 @@
 
 
     #footer {
-    position: fixed;
-    left: 0;
-    bottom: 0;
-    width: 100%;
-    height: 3rem;
-    background-color: rgb(49, 45, 45);
-    align-items: center;
-    justify-content: center;
-    display: flex;
-    padding-bottom: 0.5rem;
-    padding-top: 0.5rem;
-}
+        position: fixed;
+        left: 0;
+        bottom: 0;
+        width: 100%;
+        height: 3rem;
+        background-color: rgb(49, 45, 45);
+        align-items: center;
+        justify-content: center;
+        display: flex;
+        padding-bottom: 0.5rem;
+        padding-top: 0.5rem;
+    }
 
     #add-content-button {
-    cursor: pointer;
-    height: 3rem;
-    width: 3rem;
-    border-radius: 50%;
-    border-color: black;
-    border-width: 4px;
-    border-style: solid;
-    box-sizing: border-box;
-    user-select: none;
-    -webkit-user-select: none;
-    -webkit-user-drag: none;
+        cursor: pointer;
+        height: 3rem;
+        width: 3rem;
+        border-radius: 50%;
+        border-color: black;
+        border-width: 4px;
+        border-style: solid;
+        box-sizing: border-box;
+        user-select: none;
+        -webkit-user-select: none;
+        -webkit-user-drag: none;
     }
 
     .content-piece-div {

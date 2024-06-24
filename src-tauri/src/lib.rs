@@ -1,4 +1,4 @@
-use std::{fs, path::PathBuf};
+use std::{fs, path::PathBuf, time::{self, SystemTime, UNIX_EPOCH}};
 
 use tauri::{AppHandle, Event, Manager};
 use tauri_plugin_dialog::{DialogExt, FileDialogBuilder};
@@ -9,7 +9,7 @@ pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_shell::init())
-        .invoke_handler(tauri::generate_handler![create_entry, read_entries, get_settings, change_content_piece])
+        .invoke_handler(tauri::generate_handler![create_entry, read_entries, get_settings, change_content_piece, add_content_piece])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
@@ -39,7 +39,7 @@ struct ContentPiece {
     r#type: String,
     path: Option<String>,
     text: Option<String>,
-    creation_date: i32
+    creation_date: u64
 }
 
 fn save_entry_settings(app: AppHandle, title: String, goals: Vec<Goal>, description: String) {
@@ -101,12 +101,17 @@ fn change_content_piece(app: AppHandle, uuid: String, index: usize, text: Option
         if entry_dir.exists() {
             let settings_path = entry_dir.join("settings.json");
             let mut settings_json: EntrySettings = serde_json::from_str(&std::fs::read_to_string(&settings_path).expect("failed to read entry settings")).expect("failed to deserialize entry settings");
-            let mut content_piece = settings_json.content[index].clone();
+            let mut content_piece: ContentPiece = settings_json.content[index].clone();
 
             if content_piece.r#type != "text" {
-                DialogExt::dialog(&app).file()
-                .add_filter("Images", &["png", "jpg", "jpeg"])
-                .pick_file(move |file_path| {
+                let mut dialog = DialogExt::dialog(&app).file();
+                match content_piece.r#type.as_str() {
+                    "image"=>dialog = dialog.add_filter("Image", &["png", "jpg", "jpeg"]),
+                    "video"=>dialog = dialog.add_filter("Video", &["mp4", "mov", "mkv", "webm"]),
+                    "audio"=>dialog = dialog.add_filter("Audio", &["mp3", "wav", "ogg"]),
+                    _=>()
+                }
+                dialog.pick_file(move |file_path| {
                     if file_path.is_some() {
                         let content_path = file_path.unwrap().path;
                         let content_uuid = Uuid::new_v4();
@@ -125,6 +130,46 @@ fn change_content_piece(app: AppHandle, uuid: String, index: usize, text: Option
             }else {
                 content_piece.text = text;
                 settings_json.content[index] = content_piece;
+                fs::write(settings_path, serde_json::to_string_pretty(&settings_json).expect("failed to serialize entry settings")).expect("failed to write entry settings");
+                app.emit("reload_entry", uuid).unwrap();
+            }
+        }
+    }
+}
+
+#[tauri::command]
+fn add_content_piece(app: AppHandle, uuid: String, r#type: String) {
+    let app_data_dir = app.path().app_data_dir().expect("failed to get app data dir");
+    let entries_dir = app_data_dir.join("entries");
+    if entries_dir.exists() {
+        let entry_dir = entries_dir.join(&uuid);
+        if entry_dir.exists() {
+            let settings_path = entry_dir.join("settings.json");
+            let mut settings_json: EntrySettings = serde_json::from_str(&std::fs::read_to_string(&settings_path).expect("failed to read entry settings")).expect("failed to deserialize entry settings");
+
+            if r#type != "text" {
+                let mut dialog = DialogExt::dialog(&app).file();
+                match r#type.as_str() {
+                    "image"=>dialog = dialog.add_filter("Image", &["png", "jpg", "jpeg"]),
+                    "video"=>dialog = dialog.add_filter("Video", &["mp4", "mov", "mkv", "webm"]),
+                    "audio"=>dialog = dialog.add_filter("Audio", &["mp3", "wav", "ogg"]),
+                    _=>()
+                }
+                dialog.pick_file(move |file_path| {
+                    if file_path.is_some() {
+                        let content_path = file_path.unwrap().path;
+                        let content_uuid = Uuid::new_v4();
+                        let new_file_name = format!("{}.{}", content_uuid.to_string(), PathBuf::from(&content_path).extension().unwrap().to_str().unwrap());
+                        let new_content_path = entry_dir.join("content").join(&new_file_name);
+                        fs::copy(content_path, &new_content_path).expect("failed to copy content file");
+
+                        settings_json.content.push(ContentPiece {r#type, path: Some(new_file_name), text: None, creation_date: SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs()});
+                        fs::write(settings_path, serde_json::to_string_pretty(&settings_json).expect("failed to serialize entry settings")).expect("failed to write entry settings");
+                        app.emit("reload_entry", uuid).unwrap();
+                    }
+                });
+            }else {
+                settings_json.content.push(ContentPiece {r#type, path: None, text: Some("".to_owned()), creation_date: SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs()});
                 fs::write(settings_path, serde_json::to_string_pretty(&settings_json).expect("failed to serialize entry settings")).expect("failed to write entry settings");
                 app.emit("reload_entry", uuid).unwrap();
             }
