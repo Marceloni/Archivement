@@ -36,6 +36,17 @@
     event.listen("reload_entry", (event) => {
         reloadContentPieces(event.payload as string)
     })
+
+    window.onclick = function(event) {
+        if (!(event.target as HTMLElement).matches("#add-content-button")) {
+            addContentDropdownShown = false
+        }
+    } 
+
+    let addContentDropdownShown = false
+    function openAddContentDropdown() {
+        addContentDropdownShown = !addContentDropdownShown
+    }
   </script>
   <div id="content-edit-page">
       <h1 id="entry-title">{settings.title}</h1>
@@ -72,59 +83,120 @@
               </div>
           {/each}
       </div>
+      <div id="footer">
+        <img id="add-content-button" src="../src/assets/icons/plus.svg" on:click={openAddContentDropdown}>
+        <div id="add-content-dropdown" class={addContentDropdownShown?"show":""}>
+            <a href="#">Text</a>
+            <a href="#">Image</a>
+            <a href="#">Video</a>
+            <a href="#">Audio</a>
+          </div>
+      </div>
   </div>
   <style>
-      :root {
-          font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
-          font-size: 16px;
-          line-height: 24px;
-          font-weight: 400;
-          color: white;
-          background-color: #494646;
-          text-align: center;
-      }
-      #content-edit-page {
-          display: flex;
-          flex-direction: column;
-          align-items: center;
-      }
-      #entry-description {
-          padding-bottom: 1rem;
-          border-bottom: 3px rgb(36, 36, 36) solid;
-          width: 40rem;
-      }
-      p {margin: 0px}
-      #content-pieces {
-          width: 30rem;
-      }
-      .content-piece-element {
-          width: calc(100% - 2rem);
-      }
-      .content-piece-div textarea {
-          font-family: inherit;
-          resize: none;
-          height: 8rem;
-      }
-      .reset-button, .change-content-button {
-          width: 2rem;
-          height: 2rem;
-          cursor: pointer;
-      }
-      .edit-buttons-div {
-          display: flex;
-          flex-direction: column;
-          align-self: flex-start;
-      }
-      .reset-button:hover, .change-content-button:hover {
-          filter: invert(1);
-      }
-      .content-piece-div {
-          justify-content: center;
-          display: flex;
-          flex-direction: row;
-          align-items: center;
-          margin-top: 2rem;
-          border: solid 3px rgb(36, 36, 36);
-          width: 100%;
-      }
+    #add-content-dropdown {
+        display: none;
+        position: absolute;
+        background-color: rgb(110, 110, 110);
+        width: 5rem;
+        margin-bottom: 14rem;
+        z-index: 1;
+    }
+
+    #add-content-dropdown a {
+        color: inherit;
+        padding: 0.5rem 0.5rem;
+        text-decoration: none;
+        display: block;
+    }
+    #add-content-dropdown a:hover {
+        background-color: rgb(66, 66, 66);
+    }
+    .show {display:block !important;}
+    :root {
+        font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
+        font-size: 16px;
+        line-height: 24px;
+        font-weight: 400;
+        color: white;
+        background-color: #494646;
+        text-align: center;
+    }
+    #content-edit-page {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    #entry-description {
+        padding-bottom: 1rem;
+        border-bottom: 3px rgb(36, 36, 36) solid;
+        width: 40rem;
+    }
+    p {margin: 0px}
+    #content-pieces {
+        width: 30rem;
+    }
+    .content-piece-element {
+        width: calc(100% - 2rem);
+    }
+    .content-piece-div textarea {
+        font-family: inherit;
+        resize: none;
+        height: 8rem;
+    }
+    .reset-button, .change-content-button {
+        width: 2rem;
+        height: 2rem;
+        cursor: pointer;
+        user-select: none;
+        -webkit-user-select: none;
+        -webkit-user-drag: none;
+    }
+    .edit-buttons-div {
+        display: flex;
+        flex-direction: column;
+        align-self: flex-start;
+    }
+    .reset-button:hover, .change-content-button:hover, #add-content-button:hover {
+        filter: invert(1);
+    }
+
+
+    #footer {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    height: 3rem;
+    background-color: rgb(49, 45, 45);
+    align-items: center;
+    justify-content: center;
+    display: flex;
+    padding-bottom: 0.5rem;
+    padding-top: 0.5rem;
+}
+
+    #add-content-button {
+    cursor: pointer;
+    height: 3rem;
+    width: 3rem;
+    border-radius: 50%;
+    border-color: black;
+    border-width: 4px;
+    border-style: solid;
+    box-sizing: border-box;
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-user-drag: none;
+    }
+
+    .content-piece-div {
+        justify-content: center;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        margin-top: 2rem;
+        border: solid 3px rgb(36, 36, 36);
+        width: 100%;
+    }
   </style>

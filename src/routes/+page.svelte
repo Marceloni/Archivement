@@ -93,16 +93,18 @@
 
   #create-entry-button {
     cursor: pointer;
-    height: 50px;
-    width: 50px;
+    height: 3rem;
+    width: 3rem;
     border-radius: 50%;
     border-color: black;
     border-width: 4px;
     border-style: solid;
     box-sizing: border-box;
-    filter: invert(1);
     user-select: none;
     -webkit-user-select: none;
     -webkit-user-drag: none;
+  }
+  #create-entry-button:hover {
+    filter: invert(1);
   }
 </style>
