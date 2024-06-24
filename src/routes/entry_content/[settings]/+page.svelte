@@ -1,6 +1,6 @@
 <script lang="ts">
     import type { EntrySettings } from "../../../entrySettings";
-
+    import {open} from "@tauri-apps/plugin-dialog"
     /** @type {import('./$types').PageData} */
 	export let data;
     let settings: EntrySettings = JSON.parse(data.settings)
@@ -16,6 +16,12 @@
         }else {
             contentPieceElement.setAttribute("src", settings.content[index].path as string)
         }
+    }
+
+    function changeFileButton() {
+        open({multiple: false, filters: [{"name": "images", "extensions": ["png", "jpg", "jpeg"]}]}).then((result) => {
+            
+        })
     }
 </script>
 <div id="content-edit-page">
@@ -40,7 +46,13 @@
                     <source src={contentPiece.path} type="audio/mpeg">
                 </audio>
                 {/if}
-            <img src="../src/assets/icons/reload.svg" class="reset-button" on:click={revertContentPiece}>
+                
+                <div class="edit-buttons-div">
+                    <img src="../src/assets/icons/reload.svg" class="reset-button" on:click={revertContentPiece}>
+                    {#if contentPiece.type != "text"}
+                        <img src="../src/assets/icons/file.svg" class="change-file-button" on:click={changeFileButton}>
+                    {/if}
+                </div>
             </div>
         {/each}
     </div>
@@ -70,16 +82,24 @@
         width: 30rem;
     }
     .content-piece-element {
-        height: auto;
         width: calc(100% - 2rem);
     }
-    .reset-button {
+    .content-piece-div textarea {
+        font-family: inherit;
+        resize: none;
+        height: 8rem;
+    }
+    .reset-button, .change-file-button {
         width: 2rem;
         height: 2rem;
         cursor: pointer;
+    }
+    .edit-buttons-div {
+        display: flex;
+        flex-direction: column;
         align-self: flex-start;
     }
-    .reset-button:hover {
+    .reset-button:hover, .change-file-button:hover {
         filter: invert(1);
     }
     .content-piece-div {

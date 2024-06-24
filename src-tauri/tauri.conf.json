@@ -22,10 +22,10 @@
         "enable": true,
         "scope": ["$APPDATA/**"]
       },
-      "capabilities": [],
       "csp": null
     }
   },
+  "plugins": {},
   "bundle": {
     "active": true,
     "targets": "all",
