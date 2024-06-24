@@ -1,29 +1,47 @@
 <script lang="ts">
-    import { invoke } from "@tauri-apps/api/core";
-      import type { EntrySettings } from "../../../entrySettings";
-      import {open} from "@tauri-apps/plugin-dialog"
-      /** @type {import('./$types').PageData} */
-      export let data;
-      let settings: EntrySettings = JSON.parse(data.settings)
-      function revertContentPiece(e: MouseEvent) {
-          let target = e.currentTarget as HTMLElement
-          let contentPieceElement = target.parentElement?.querySelector(".content-piece-element") as HTMLInputElement
-          let parentElement = target.parentElement as HTMLDivElement
-          let index = parseInt(parentElement.dataset.index as string);
-          let type = parentElement.dataset.type as string
-  
-          if (type === "text") {
-              contentPieceElement.value = settings.content[index].text as string
-          }else {
-              contentPieceElement.setAttribute("src", settings.content[index].path as string)
-          }
-      }
-  
-      function changeContentButton(e: MouseEvent) {
-          let target = e.currentTarget as HTMLElement
-          let contentPieceDiv = target.parentElement?.parentElement as HTMLDivElement;
-          invoke("change_content_piece", {uuid: settings.uuid, index: parseInt(contentPieceDiv.dataset.index as string), text: contentPieceDiv.dataset.type=="text" ? (contentPieceDiv.querySelector(".content-piece-element input") as HTMLInputElement).value : undefined})
-      }
+    import { convertFileSrc, invoke } from "@tauri-apps/api/core";
+    import type { EntrySettings } from "../../../entrySettings";
+    import {open} from "@tauri-apps/plugin-dialog"
+    import { event } from "@tauri-apps/api";
+    import { appDataDir, join } from "@tauri-apps/api/path";
+    /** @type {import('./$types').PageData} */
+    export let data;
+    let settings: EntrySettings = JSON.parse(data.settings)
+    function revertContentPiece(e: MouseEvent) {
+        let target = e.currentTarget as HTMLElement
+        let contentPieceElement = target.parentElement?.querySelector(".content-piece-element") as HTMLInputElement
+        let parentElement = target.parentElement as HTMLDivElement
+        let index = parseInt(parentElement.dataset.index as string);
+        let type = parentElement.dataset.type as string
+
+        if (type === "text") {
+            contentPieceElement.value = settings.content[index].text as string
+        }else {
+            contentPieceElement.setAttribute("src", settings.content[index].path as string)
+        }
+    }
+
+    async function reloadContentPieces(uuid: String) {
+        let new_settings: EntrySettings = await invoke("get_settings", {uuid})
+        new_settings.content = await Promise.all(new_settings.content.map(async (contentPiece) => {
+            if (contentPiece.type === "image" || contentPiece.type === "video" || contentPiece.type === "audio") {
+                console.log(await convertFileSrc(await join(await appDataDir(), "entries", new_settings.uuid, "content", contentPiece.path as string)))
+                contentPiece.path = await convertFileSrc(await join(await appDataDir(), "entries", new_settings.uuid, "content", contentPiece.path as string))
+            }
+            return contentPiece
+        }))
+        settings = new_settings
+    }
+
+    async function changeContentButton(e: MouseEvent) {
+        let target = e.currentTarget as HTMLElement
+        let contentPieceDiv = target.parentElement?.parentElement as HTMLDivElement;
+        await invoke("change_content_piece", {uuid: settings.uuid, index: parseInt(contentPieceDiv.dataset.index as string), text: contentPieceDiv.dataset.type=="text" ? (contentPieceDiv.querySelector(".content-piece-element input") as HTMLInputElement).value : undefined})
+    }
+
+    event.listen("reload_entry", (event) => {
+        reloadContentPieces(event.payload as string)
+    })
   </script>
   <div id="content-edit-page">
       <h1 id="entry-title">{settings.title}</h1>

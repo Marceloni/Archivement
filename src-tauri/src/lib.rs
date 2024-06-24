@@ -1,6 +1,6 @@
 use std::{fs, path::PathBuf};
 
-use tauri::{AppHandle, Manager};
+use tauri::{AppHandle, Event, Manager};
 use tauri_plugin_dialog::{DialogExt, FileDialogBuilder};
 use uuid::Uuid;
 
@@ -88,6 +88,7 @@ fn get_settings(app: AppHandle, uuid: String) -> EntrySettings {
     let entry_dir = entries_dir.join(uuid);
     let entry_settings_path = entry_dir.join("settings.json");
     let entry_settings_json: EntrySettings = serde_json::from_str(&std::fs::read_to_string(entry_settings_path).expect("failed to read entry settings")).expect("failed to deserialize entry settings");
+    println!("{:?}", serde_json::to_string_pretty(&entry_settings_json));
     return entry_settings_json;
 }
 
@@ -96,7 +97,7 @@ fn change_content_piece(app: AppHandle, uuid: String, index: usize, text: Option
     let app_data_dir = app.path().app_data_dir().expect("failed to get app data dir");
     let entries_dir = app_data_dir.join("entries");
     if entries_dir.exists() {
-        let entry_dir = entries_dir.join(uuid);
+        let entry_dir = entries_dir.join(&uuid);
         if entry_dir.exists() {
             let settings_path = entry_dir.join("settings.json");
             let mut settings_json: EntrySettings = serde_json::from_str(&std::fs::read_to_string(&settings_path).expect("failed to read entry settings")).expect("failed to deserialize entry settings");
@@ -118,12 +119,14 @@ fn change_content_piece(app: AppHandle, uuid: String, index: usize, text: Option
                         content_piece.path = Some(new_file_name);
                         settings_json.content[index] = content_piece;
                         fs::write(settings_path, serde_json::to_string_pretty(&settings_json).expect("failed to serialize entry settings")).expect("failed to write entry settings");
+                        app.emit("reload_entry", uuid).unwrap();
                     }
                 });
             }else {
                 content_piece.text = text;
                 settings_json.content[index] = content_piece;
                 fs::write(settings_path, serde_json::to_string_pretty(&settings_json).expect("failed to serialize entry settings")).expect("failed to write entry settings");
+                app.emit("reload_entry", uuid).unwrap();
             }
         }
     }
