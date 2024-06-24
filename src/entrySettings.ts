@@ -13,5 +13,5 @@ export interface ContentPiece {
     type: "image" | "text" | "video" | "audio"
     path: string | undefined
     text: string | undefined
-    craetionDate: number
+    creation_date: number
 }

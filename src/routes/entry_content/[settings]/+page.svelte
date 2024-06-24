@@ -88,6 +88,7 @@
                             <img src="../src/assets/icons/save.svg" class="change-content-button" on:click={changeContentButton}>
                         {/if}
                     </div>
+                    <p class="creation-date">{new Date(contentPiece.creation_date*1000).toLocaleString({})}</p>
               </div>
           {/each}
       </div>
@@ -102,6 +103,9 @@
       </div>
   </div>
   <style>
+    .creation-date {
+        
+    }
     #add-content-dropdown {
         display: none;
         background-color: rgb(110, 110, 110);
