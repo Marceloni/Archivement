@@ -7,18 +7,12 @@
     /** @type {import('./$types').PageData} */
     export let data;
     let settings: EntrySettings = JSON.parse(data.settings)
-    function revertContentPiece(e: MouseEvent) {
+    function revertText(e: MouseEvent) {
         let target = e.currentTarget as HTMLElement
-        let contentPieceElement = target.parentElement?.querySelector(".content-piece-element") as HTMLInputElement
-        let parentElement = target.parentElement as HTMLDivElement
-        let index = parseInt(parentElement.dataset.index as string);
-        let type = parentElement.dataset.type as string
-
-        if (type === "text") {
-            contentPieceElement.value = settings.content[index].text as string
-        }else {
-            contentPieceElement.setAttribute("src", settings.content[index].path as string)
-        }
+        let parentElement = target.parentElement?.parentElement as HTMLDivElement
+        let contentPieceElement = parentElement.querySelector("textarea.content-piece-element") as HTMLInputElement
+        let index = parseInt(parentElement.dataset.index as string)
+        contentPieceElement.value = settings.content[index].text as string
     }
 
     async function reloadContentPieces(uuid: String) {
@@ -36,7 +30,7 @@
     async function changeContentButton(e: MouseEvent) {
         let target = e.currentTarget as HTMLElement
         let contentPieceDiv = target.parentElement?.parentElement as HTMLDivElement;
-        await invoke("change_content_piece", {uuid: settings.uuid, index: parseInt(contentPieceDiv.dataset.index as string), text: contentPieceDiv.dataset.type=="text" ? (contentPieceDiv.querySelector(".content-piece-element input") as HTMLInputElement).value : undefined})
+        await invoke("change_content_piece", {uuid: settings.uuid, index: parseInt(contentPieceDiv.dataset.index as string), text: contentPieceDiv.dataset.type=="text" ? (contentPieceDiv.querySelector("textarea.content-piece-element") as HTMLInputElement).value : undefined})
     }
 
     event.listen("reload_entry", (event) => {
@@ -67,9 +61,12 @@
                   {/if}
                   
                   <div class="edit-buttons-div">
-                      <img src="../src/assets/icons/reload.svg" class="reset-button" on:click={revertContentPiece}>
                       {#if contentPiece.type != "text"}
-                          <img src="../src/assets/icons/file.svg" class="change-file-button" on:click={changeContentButton}>
+                          <img src="../src/assets/icons/file.svg" class="change-content-button" on:click={changeContentButton}>
+                      {/if}
+                      {#if contentPiece.type === "text"}
+                        <img src="../src/assets/icons/reload.svg" class="reset-button" on:click={revertText}>
+                        <img src="../src/assets/icons/save.svg" class="change-content-button" on:click={changeContentButton}>
                       {/if}
                   </div>
               </div>
@@ -108,7 +105,7 @@
           resize: none;
           height: 8rem;
       }
-      .reset-button, .change-file-button {
+      .reset-button, .change-content-button {
           width: 2rem;
           height: 2rem;
           cursor: pointer;
@@ -118,7 +115,7 @@
           flex-direction: column;
           align-self: flex-start;
       }
-      .reset-button:hover, .change-file-button:hover {
+      .reset-button:hover, .change-content-button:hover {
           filter: invert(1);
       }
       .content-piece-div {
