@@ -9,7 +9,7 @@ pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_shell::init())
-        .invoke_handler(tauri::generate_handler![create_entry, read_entries, get_settings])
+        .invoke_handler(tauri::generate_handler![create_entry, read_entries, get_settings, change_content_piece])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
@@ -91,13 +91,8 @@ fn get_settings(app: AppHandle, uuid: String) -> EntrySettings {
     return entry_settings_json;
 }
 
-fn replace_content_piece(app: AppHandle, uuid: String, index: usize, text: Option<String>) {
-    DialogExt::dialog(&app).file()
-    .add_filter("Images", &["png", "jpg", "jpeg"])
-    .pick_file(|file_path| {
-        println!("{:?}", file_path);
-    });
-
+#[tauri::command]
+fn change_content_piece(app: AppHandle, uuid: String, index: usize, text: Option<String>) {
     let app_data_dir = app.path().app_data_dir().expect("failed to get app data dir");
     let entries_dir = app_data_dir.join("entries");
     if entries_dir.exists() {
@@ -108,15 +103,28 @@ fn replace_content_piece(app: AppHandle, uuid: String, index: usize, text: Optio
             let mut content_piece = settings_json.content[index].clone();
 
             if content_piece.r#type != "text" {
-                let content_uuid = Uuid::new_v4();
-                let content_path = content_piece.clone().path.unwrap();
-                let new_content_path = entry_dir.join("content").join(format!("{}.{}", content_uuid.to_string(), PathBuf::from(&content_path).extension().unwrap().to_str().unwrap()));
-                fs::copy(content_path, &new_content_path).expect("failed to copy content file");
-                content_piece.path = Some(new_content_path.to_str().unwrap().to_owned());
-            }else {content_piece.text = text;}
-            
-            settings_json.content[index] = content_piece;
-            fs::write(settings_path, serde_json::to_string_pretty(&settings_json).expect("failed to serialize entry settings")).expect("failed to write entry settings");
+                DialogExt::dialog(&app).file()
+                .add_filter("Images", &["png", "jpg", "jpeg"])
+                .pick_file(move |file_path| {
+                    if file_path.is_some() {
+                        let content_path = file_path.unwrap().path;
+                        let content_uuid = Uuid::new_v4();
+                        let new_file_name = format!("{}.{}", content_uuid.to_string(), PathBuf::from(&content_path).extension().unwrap().to_str().unwrap());
+                        let new_content_path = entry_dir.join("content").join(&new_file_name);
+                        fs::copy(content_path, &new_content_path).expect("failed to copy content file");
+                        let old_content_path = entry_dir.join("content").join(settings_json.content[index].path.as_ref().unwrap());
+                        if old_content_path.exists() {fs::remove_file(&old_content_path).expect("failed to remove old content file");}
+
+                        content_piece.path = Some(new_file_name);
+                        settings_json.content[index] = content_piece;
+                        fs::write(settings_path, serde_json::to_string_pretty(&settings_json).expect("failed to serialize entry settings")).expect("failed to write entry settings");
+                    }
+                });
+            }else {
+                content_piece.text = text;
+                settings_json.content[index] = content_piece;
+                fs::write(settings_path, serde_json::to_string_pretty(&settings_json).expect("failed to serialize entry settings")).expect("failed to write entry settings");
+            }
         }
     }
 }

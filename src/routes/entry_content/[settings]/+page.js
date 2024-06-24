@@ -1,5 +1,4 @@
 /** @type {import('./$types').PageLoad} */
 export function load({ params }) {
-    console.log(params.settings)
 	return {settings: params.settings};
 }
