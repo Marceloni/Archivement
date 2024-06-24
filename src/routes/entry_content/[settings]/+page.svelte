@@ -53,37 +53,41 @@
     }
   </script>
   <div id="content-edit-page">
-      <h1 id="entry-title">{settings.title}</h1>
-      <p id="entry-description">{settings.description}</p>
-      <div id="content-pieces">
-          {#each settings.content as contentPiece, index}
-              <div class="content-piece-div" data-index={index} data-type={contentPiece.type}>
-                  {#if contentPiece.type === "image"}
-                      <img src={contentPiece.path} class="content-piece-element">
-                  {/if}
-                  {#if contentPiece.type === "text"}
-                      <textarea class="content-piece-element">{contentPiece.text}</textarea>
-                  {/if}
-                  {#if contentPiece.type === "video"}
-                  <video controls class="content-piece-element">
-                      <source src={contentPiece.path} type="video/mp4">
-                  </video>
-                  {/if}
-                  {#if contentPiece.type === "audio"}
-                  <audio controls class="content-piece-element">
-                      <source src={contentPiece.path} type="audio/mpeg">
-                  </audio>
-                  {/if}
-                  
-                  <div class="edit-buttons-div">
-                      {#if contentPiece.type != "text"}
-                          <img src="../src/assets/icons/file.svg" class="change-content-button" on:click={changeContentButton}>
-                      {/if}
-                      {#if contentPiece.type === "text"}
-                        <img src="../src/assets/icons/reload.svg" class="reset-button" on:click={revertText}>
-                        <img src="../src/assets/icons/save.svg" class="change-content-button" on:click={changeContentButton}>
-                      {/if}
-                  </div>
+        <h1 id="entry-title">{settings.title}</h1>
+        <p id="entry-description">{settings.description}</p>
+        <div id="content-pieces">
+            {#each settings.content as contentPiece, index}
+                <div class="content-piece-div" data-index={index} data-type={contentPiece.type}>
+                    {#if contentPiece.type === "image"}
+                        <img src={contentPiece.path} class="content-piece-element">
+                    {/if}
+                    {#if contentPiece.type === "text"}
+                        <textarea class="content-piece-element">{contentPiece.text}</textarea>
+                    {/if}
+                    {#if contentPiece.type === "video"}
+                        {#key contentPiece.path}
+                            <video controls class="content-piece-element">
+                                <source src={contentPiece.path} type="video/mp4">
+                            </video>
+                        {/key}
+                    {/if}
+                    {#if contentPiece.type === "audio"}
+                        {#key contentPiece.path}
+                            <audio controls class="content-piece-element">
+                                <source src={contentPiece.path} type="audio/mpeg">
+                            </audio>
+                        {/key}
+                    {/if}
+                    
+                    <div class="edit-buttons-div">
+                        {#if contentPiece.type != "text"}
+                            <img src="../src/assets/icons/file.svg" class="change-content-button" on:click={changeContentButton}>
+                        {/if}
+                        {#if contentPiece.type === "text"}
+                            <img src="../src/assets/icons/reload.svg" class="reset-button" on:click={revertText}>
+                            <img src="../src/assets/icons/save.svg" class="change-content-button" on:click={changeContentButton}>
+                        {/if}
+                    </div>
               </div>
           {/each}
       </div>
