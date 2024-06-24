@@ -67,7 +67,7 @@
   }
 
   #create-entry-page {
-    margin-bottom: 4rem;
+    margin-bottom: 5rem;
   }
 
   #goals-list {

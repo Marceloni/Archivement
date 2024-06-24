@@ -14,11 +14,10 @@
     let settings_files: EntrySettings[] = await invoke("read_entries")
     settings_files.forEach(async (settings) => {
       settings.content = await Promise.all(settings.content.map(async (contentPiece) => {
-      if (contentPiece.type === "image" || contentPiece.type === "video" || contentPiece.type === "audio") {
-        console.log(await convertFileSrc(await join(await appDataDir(), "entries", settings.uuid, "content", contentPiece.path as string)))
-        contentPiece.path = await convertFileSrc(await join(await appDataDir(), "entries", settings.uuid, "content", contentPiece.path as string))
-      }
-      return contentPiece
+        if (contentPiece.type === "image" || contentPiece.type === "video" || contentPiece.type === "audio") {
+          contentPiece.path = await convertFileSrc(await join(await appDataDir(), "entries", settings.uuid, "content", contentPiece.path as string))
+        }
+        return contentPiece
       }))
       
       new Entry({target: document.getElementById("entry-list") as HTMLElement, props: {settings}})
@@ -52,7 +51,7 @@
   }
 
   #home-page {
-    margin-bottom: 4rem;
+    margin-bottom: 5rem;
   }
 
   h1, p {

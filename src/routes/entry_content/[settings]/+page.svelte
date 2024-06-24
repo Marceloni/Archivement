@@ -19,7 +19,6 @@
         let new_settings: EntrySettings = await invoke("get_settings", {uuid})
         new_settings.content = await Promise.all(new_settings.content.map(async (contentPiece) => {
             if (contentPiece.type === "image" || contentPiece.type === "video" || contentPiece.type === "audio") {
-                console.log(await convertFileSrc(await join(await appDataDir(), "entries", new_settings.uuid, "content", contentPiece.path as string)))
                 contentPiece.path = await convertFileSrc(await join(await appDataDir(), "entries", new_settings.uuid, "content", contentPiece.path as string))
             }
             return contentPiece
@@ -133,6 +132,7 @@
         display: flex;
         flex-direction: column;
         align-items: center;
+        margin-bottom: 5rem;
     }
     #entry-description {
         padding-bottom: 1rem;

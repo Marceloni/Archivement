@@ -12,16 +12,16 @@
 <div class="entry" on:click={openEntry}>
   <h2 class="entry-title">{settings.title}</h2>
   <div class="content-preview">
-    {#each settings.content as contentPiece}
-      {#if contentPiece.type === "image"}<img src={contentPiece.path} alt="Image">{/if}
-      {#if contentPiece.type === "text"}<p>{contentPiece.text}</p>{/if}
+    {#each settings.content.slice(0, 5) as contentPiece}
+      {#if contentPiece.type === "image"}<img src={contentPiece.path} alt="Image" class="content-preview-element">{/if}
+      {#if contentPiece.type === "text"}<p class="content-preview-element">{contentPiece.text}</p>{/if}
       {#if contentPiece.type === "video"}
-        <video controls>
+        <video controls class="content-preview-element">
           <source src={contentPiece.path} type="video/mp4">
         </video>
       {/if}
       {#if contentPiece.type === "audio"}
-        <audio controls>
+        <audio controls class="content-preview-element">
           <source src={contentPiece.path} type="audio/mpeg">
         </audio>
       {/if}
@@ -53,7 +53,16 @@
     align-items: center;
     grid-template-columns: repeat(4, 1fr);
     grid-template-rows: repeat(2, 1fr);
-    gap: 0.25rem; /* Optional: Add space between the grid items */
+    gap: 0.25rem;
+  }
+  .content-preview p {
+    user-select: none;
+    -webkit-user-select: none;
+    -webkit-user-drag: none;
+    width: 100%;
+    height: auto;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
   .content-preview img, .content-preview video {
     user-select: none;
@@ -68,23 +77,23 @@
     -webkit-user-drag: none;
     width: 100%;
   }
-  .content-preview img:nth-child(1) {
-    grid-column: 1 / 3; /* Span 2 columns */
-    grid-row: 1 / 3;    /* Span 2 rows */
+  .content-preview-element:nth-child(1) {
+    grid-column: 1 / 3;
+    grid-row: 1 / 3;
   }
-  .content-preview img:nth-child(2) {
+  .content-preview-element:nth-child(2) {
     grid-column: 3 / 4;
     grid-row: 1 / 2;
   }
-  .content-preview img:nth-child(3) {
+  .content-preview-element:nth-child(3) {
     grid-column: 4 / 4;
     grid-row: 1 / 2;
   }
-  .content-preview img:nth-child(4) {
+  .content-preview-element:nth-child(4) {
     grid-column: 3 / 4;
     grid-row: 2 / 2;
   }
-  .content-preview img:nth-child(5) {
+  .content-preview-element:nth-child(5) {
     grid-column: 4 / 4;
     grid-row: 2 / 2;
   }

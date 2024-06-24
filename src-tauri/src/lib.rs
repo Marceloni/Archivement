@@ -16,7 +16,6 @@ pub fn run() {
 
 #[tauri::command]
 fn create_entry(app: AppHandle, title: String, goals: Vec<String>, description: String) {
-    println!("{}", format!("Creating entry with title: {}", title));
     let goals_vec: Vec<Goal> = goals.iter().map(|goal| Goal {title: goal.to_owned(), completed: false}).collect();
     save_entry_settings(app, title, goals_vec, description)
 }
@@ -48,10 +47,8 @@ fn save_entry_settings(app: AppHandle, title: String, goals: Vec<Goal>, descript
     if !entries_dir.exists() {std::fs::create_dir_all(&entries_dir).expect("failed to create entries dir");}
 
     let id = Uuid::new_v4();
-    println!("{}", format!("Saving entry with id: {}", id.to_string()));
 
     let entry_dir = entries_dir.join(id.to_string());
-    println!("{}", format!("Entry dir: {:?}", entry_dir));
     std::fs::create_dir_all(&entry_dir).expect("failed to create entry dir");
 
     let content_dir = entry_dir.join("content");
@@ -88,7 +85,6 @@ fn get_settings(app: AppHandle, uuid: String) -> EntrySettings {
     let entry_dir = entries_dir.join(uuid);
     let entry_settings_path = entry_dir.join("settings.json");
     let entry_settings_json: EntrySettings = serde_json::from_str(&std::fs::read_to_string(entry_settings_path).expect("failed to read entry settings")).expect("failed to deserialize entry settings");
-    println!("{:?}", serde_json::to_string_pretty(&entry_settings_json));
     return entry_settings_json;
 }
 
