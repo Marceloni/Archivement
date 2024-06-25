@@ -36,7 +36,9 @@
   </div>
 
   <div id="footer">
-    <img alt="Create Entry" on:click={addEntry} id="create-entry-button" src="src/assets/icons/plus.svg">
+    <div id="create-entry-button" on:click={addEntry}>
+      <div class="icon" style="mask-image: url('src/assets/icons/plus.svg'); -webkit-mask-image: url('src/assets/icons/plus.svg'); height: 100%"/>
+    </div>
   </div>
 </div>
 
@@ -73,7 +75,7 @@
     bottom: 0;
     width: 100%;
     height: 3rem;
-    background-color: var(--primary);
+    background-color: var(--secondary);
     align-items: center;
     justify-content: center;
     display: flex;
@@ -82,18 +84,14 @@
   }
 
   #create-entry-button {
+    box-sizing: border-box;
     cursor: pointer;
     height: 3rem;
     width: 3rem;
     border-radius: 50%;
-    border-color: black;
+    border-color: var(--text);
     border-width: 4px;
     border-style: solid;
-    box-sizing: border-box;
-    user-select: none;
-    -webkit-user-select: none;
-    -webkit-user-drag: none;
-    fill: var(--text);
   }
   #create-entry-button:hover {
     filter: invert(1);

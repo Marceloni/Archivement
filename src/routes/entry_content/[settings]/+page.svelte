@@ -88,13 +88,13 @@
                         
                         <div class="edit-buttons-div">
                             {#if contentPiece.type != "text"}
-                                <img src="../src/assets/icons/file.svg" class="change-content-button" on:click={changeContentButton}>
+                                <div class="icon change-content-button" style="mask-image: url('../src/assets/icons/file.svg'); -webkit-mask-image: url('../src/assets/icons/file.svg');" on:click={changeContentButton}/>
                             {/if}
                             {#if contentPiece.type === "text"}
-                                <img src="../src/assets/icons/reload.svg" class="reset-button" on:click={revertText}>
-                                <img src="../src/assets/icons/save.svg" class="change-content-button" on:click={changeContentButton}>
+                                <div class="icon reset-button" style="mask-image: url('../src/assets/icons/reload.svg'); -webkit-mask-image: url('../src/assets/icons/reload.svg');" on:click={revertText}/>
+                                <div class="icon reset-button" style="mask-image: url('../src/assets/icons/save.svg'); -webkit-mask-image: url('../src/assets/icons/save.svg');" on:click={changeContentButton}/>
                             {/if}
-                            <img src="../src/assets/icons/close.svg" class="remove-content-button" on:click={removeContentButton}>
+                            <div class="icon reset-button" style="mask-image: url('../src/assets/icons/close.svg'); -webkit-mask-image: url('../src/assets/icons/close.svg');" on:click={removeContentButton}/>
                         </div>
                     </div>
                     <p class="creation-date">Created: { new Date(contentPiece.creation_date*1000).toLocaleString("en-gb", {day: 'numeric', month: 'numeric', year: '2-digit', hour: '2-digit', minute: '2-digit'})} </p>
@@ -102,7 +102,9 @@
           {/each}
       </div>
       <div id="footer">
-        <img id="add-content-button" src="../src/assets/icons/plus.svg" on:click={openAddContentDropdown}>
+        <div id="add-content-button" on:click={openAddContentDropdown}>
+            <div class="icon" style="mask-image: url('../src/assets/icons/plus.svg'); -webkit-mask-image: url('../src/assets/icons/plus.svg'); height:100%"/>
+        </div>
         <div id="add-content-dropdown" class={addContentDropdownShown?"show":""} on:click={addContentPiece}>
             <p data-type="text">Text</p>
             <p data-type="image">Image</p>
@@ -149,7 +151,7 @@
         width: 30rem;
     }
     .content-piece-element {
-        width: calc(100% - 2rem);
+        width: calc(100% - 3rem);
     }
     .content-piece-div textarea {
         font-family: inherit;
@@ -160,11 +162,9 @@
         width: 2rem;
         height: 2rem;
         cursor: pointer;
-        user-select: none;
-        -webkit-user-select: none;
-        -webkit-user-drag: none;
     }
     .edit-buttons-div {
+        margin-left: 1rem;
         display: flex;
         flex-direction: column;
         align-self: flex-start;
@@ -193,18 +193,17 @@
         height: 3rem;
         width: 3rem;
         border-radius: 50%;
-        border-color: black;
+        border-color: var(--text);
         border-width: 4px;
         border-style: solid;
         box-sizing: border-box;
-        user-select: none;
-        -webkit-user-select: none;
-        -webkit-user-drag: none;
     }
 
     .content-main-div {
         margin-top: 2rem;
-        border: solid 3px rgb(36, 36, 36);
+        border: solid 3px var(--secondary);
+        background-color: var(--primary);
+        padding: 1rem;
         width: 100%;
     }
     .content-piece-div {
@@ -213,5 +212,6 @@
         flex-direction: row;
         align-items: center;
         width: 100%;
+        margin-bottom: 1rem;
     }
   </style>
