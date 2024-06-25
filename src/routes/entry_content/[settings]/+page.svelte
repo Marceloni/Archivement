@@ -26,8 +26,8 @@
         settings = new_settings
     }
 
-    async function changeContentButton(e: MouseEvent) {
-        let target = e.currentTarget as HTMLElement
+    async function changeContentButton(event: MouseEvent) {
+        let target = event.currentTarget as HTMLElement
         let contentPieceDiv = target.parentElement?.parentElement as HTMLDivElement;
         await invoke("change_content_piece", {uuid: settings.uuid, index: parseInt(contentPieceDiv.dataset.index as string), text: contentPieceDiv.dataset.type=="text" ? (contentPieceDiv.querySelector("textarea.content-piece-element") as HTMLInputElement).value : undefined})
     }
@@ -50,6 +50,12 @@
     function addContentPiece(event: MouseEvent) {
         let target = event.target as HTMLElement
         invoke("add_content_piece", {uuid: settings.uuid, type: target.dataset.type})
+    }
+
+    function removeContentButton(event: MouseEvent) {
+        let target = event.currentTarget as HTMLElement
+        let contentPieceDiv = target.parentElement?.parentElement as HTMLDivElement;
+        invoke("remove_content_piece", {uuid: settings.uuid, index: parseInt(contentPieceDiv.dataset.index as string)})
     }
   </script>
   <div id="content-edit-page">
@@ -88,11 +94,11 @@
                                 <img src="../src/assets/icons/reload.svg" class="reset-button" on:click={revertText}>
                                 <img src="../src/assets/icons/save.svg" class="change-content-button" on:click={changeContentButton}>
                             {/if}
+                            <img src="../src/assets/icons/close.svg" class="remove-content-button" on:click={removeContentButton}>
                         </div>
                     </div>
-                    <p class="creation-date">{ new Date(contentPiece.creation_date*1000).toLocaleString("en-gb", {day: 'numeric', month: 'numeric', year: '2-digit', hour: '2-digit', minute: '2-digit'})} </p>
+                    <p class="creation-date">Created: { new Date(contentPiece.creation_date*1000).toLocaleString("en-gb", {day: 'numeric', month: 'numeric', year: '2-digit', hour: '2-digit', minute: '2-digit'})} </p>
                 </div>
-                
           {/each}
       </div>
       <div id="footer">
@@ -162,7 +168,7 @@
         resize: none;
         height: 8rem;
     }
-    .reset-button, .change-content-button {
+    .reset-button, .change-content-button, .remove-content-button {
         width: 2rem;
         height: 2rem;
         cursor: pointer;
@@ -175,7 +181,7 @@
         flex-direction: column;
         align-self: flex-start;
     }
-    .reset-button:hover, .change-content-button:hover, #add-content-button:hover {
+    .reset-button:hover, .change-content-button:hover, #add-content-button:hover, .remove-content-button:hover {
         filter: invert(1);
     }
 
