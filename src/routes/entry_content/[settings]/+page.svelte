@@ -57,39 +57,42 @@
         <p id="entry-description">{settings.description}</p>
         <div id="content-pieces">
             {#each settings.content as contentPiece, index}
-                <div class="content-piece-div" data-index={index} data-type={contentPiece.type}>
-                    {#if contentPiece.type === "image"}
-                        <img src={contentPiece.path} class="content-piece-element">
-                    {/if}
-                    {#if contentPiece.type === "text"}
-                        <textarea class="content-piece-element">{contentPiece.text}</textarea>
-                    {/if}
-                    {#if contentPiece.type === "video"}
-                        {#key contentPiece.path}
-                            <video controls class="content-piece-element">
-                                <source src={contentPiece.path} type="video/mp4">
-                            </video>
-                        {/key}
-                    {/if}
-                    {#if contentPiece.type === "audio"}
-                        {#key contentPiece.path}
-                            <audio controls class="content-piece-element">
-                                <source src={contentPiece.path} type="audio/mpeg">
-                            </audio>
-                        {/key}
-                    {/if}
-                    
-                    <div class="edit-buttons-div">
-                        {#if contentPiece.type != "text"}
-                            <img src="../src/assets/icons/file.svg" class="change-content-button" on:click={changeContentButton}>
+                <div class="content-main-div">
+                    <div class="content-piece-div" data-index={index} data-type={contentPiece.type}>
+                        {#if contentPiece.type === "image"}
+                            <img src={contentPiece.path} class="content-piece-element">
                         {/if}
                         {#if contentPiece.type === "text"}
-                            <img src="../src/assets/icons/reload.svg" class="reset-button" on:click={revertText}>
-                            <img src="../src/assets/icons/save.svg" class="change-content-button" on:click={changeContentButton}>
+                            <textarea class="content-piece-element">{contentPiece.text}</textarea>
                         {/if}
+                        {#if contentPiece.type === "video"}
+                            {#key contentPiece.path}
+                                <video controls class="content-piece-element">
+                                    <source src={contentPiece.path} type="video/mp4">
+                                </video>
+                            {/key}
+                        {/if}
+                        {#if contentPiece.type === "audio"}
+                            {#key contentPiece.path}
+                                <audio controls class="content-piece-element">
+                                    <source src={contentPiece.path} type="audio/mpeg">
+                                </audio>
+                            {/key}
+                        {/if}
+                        
+                        <div class="edit-buttons-div">
+                            {#if contentPiece.type != "text"}
+                                <img src="../src/assets/icons/file.svg" class="change-content-button" on:click={changeContentButton}>
+                            {/if}
+                            {#if contentPiece.type === "text"}
+                                <img src="../src/assets/icons/reload.svg" class="reset-button" on:click={revertText}>
+                                <img src="../src/assets/icons/save.svg" class="change-content-button" on:click={changeContentButton}>
+                            {/if}
+                        </div>
                     </div>
-                    <p class="creation-date">{new Date(contentPiece.creation_date*1000).toLocaleString({})}</p>
-              </div>
+                    <p class="creation-date">{ new Date(contentPiece.creation_date*1000).toLocaleString("en-gb", {day: 'numeric', month: 'numeric', year: '2-digit', hour: '2-digit', minute: '2-digit'})} </p>
+                </div>
+                
           {/each}
       </div>
       <div id="footer">
@@ -205,13 +208,16 @@
         -webkit-user-drag: none;
     }
 
+    .content-main-div {
+        margin-top: 2rem;
+        border: solid 3px rgb(36, 36, 36);
+        width: 100%;
+    }
     .content-piece-div {
         justify-content: center;
         display: flex;
         flex-direction: row;
         align-items: center;
-        margin-top: 2rem;
-        border: solid 3px rgb(36, 36, 36);
         width: 100%;
     }
   </style>
