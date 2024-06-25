@@ -37,16 +37,6 @@
 </div>
 
 <style>
-  :root {
-    font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
-    font-size: 16px;
-    line-height: 24px;
-    font-weight: 400;
-    color: white;
-    background-color: #494646;
-    text-align: center;
-  }
-
   #entry-description {
     margin-top: 0.5rem;
     font-family: inherit;

@@ -112,9 +112,6 @@
       </div>
   </div>
   <style>
-    .creation-date {
-        
-    }
     #add-content-dropdown {
         display: none;
         background-color: rgb(110, 110, 110);
@@ -136,15 +133,6 @@
         background-color: rgb(66, 66, 66);
     }
     .show {display:block !important;}
-    :root {
-        font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
-        font-size: 16px;
-        line-height: 24px;
-        font-weight: 400;
-        color: white;
-        background-color: #494646;
-        text-align: center;
-    }
     #content-edit-page {
         display: flex;
         flex-direction: column;

@@ -41,15 +41,6 @@
 </div>
 
 <style>
-  :root {
-    font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
-    font-size: 16px;
-    line-height: 24px;
-    font-weight: 400;
-    color: white;
-    background-color: #494646;
-  }
-
   #home-page {
     margin-bottom: 5rem;
   }
