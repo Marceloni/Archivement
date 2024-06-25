@@ -11,7 +11,7 @@
 
 <div bind:this={input} class={closable?"goal-input-div goal-input-div-closable":"goal-input-div"}>
   <input class="goal-input" type="text" placeholder="Enter a Goal">
-  <img on:click={removeGoal} class={closable?"remove-goal-button button-closable":"remove-goal-button"} src="src/assets/icons/close.svg" alt="Remove Goal">
+  <div on:click={removeGoal} class={closable?"icon remove-goal-button button-closable":"icon remove-goal-button"} style="mask-image: url('../src/assets/icons/close.svg'); -webkit-mask-image: url('../src/assets/icons/close.svg');"/>
 </div>
 
 <style>
@@ -26,14 +26,13 @@
   }
 
   .remove-goal-button {
-    user-select: none;
-    -webkit-user-select: none;
-    -webkit-user-drag: none;
     cursor: pointer;
     display: none;
     height: 100%;
     width: 3rem;
     height: 3rem;
+  }
+  .remove-goal-button:hover {
     filter: invert(1);
   }
 

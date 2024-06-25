@@ -26,7 +26,9 @@
 
   <div id="goals-list">
     <GoalInput></GoalInput>
-    <button on:click={addGoal} id="add-goal-button"/>
+    <div on:click={addGoal} id="add-goal-button">
+      <div class="icon" style="mask-image: url('src/assets/icons/plus.svg'); -webkit-mask-image: url('src/assets/icons/plus.svg'); height: 100%"/>
+    </div>
   </div>
 
   <textarea id="entry-description" placeholder="Description" maxlength=128/>
@@ -47,13 +49,13 @@
 
   #add-goal-button {
     cursor: pointer;
-    background-color: white;
-    border: 3px solid black;
-    background-image: url("src/assets/icons/plus.svg");
-    width: 80px;
-    background-repeat: no-repeat;
-    background-position: center;
-    height: 35px;
+    border: 3px solid var(--text);
+    border-radius: 50%;
+    width: 2rem;
+    height: 2rem;
+  }
+  #add-goal-button:hover {
+    filter: invert(1);
   }
 
   #create-entry-page {
@@ -63,12 +65,12 @@
   #goals-list {
     padding: 0.5rem;
     background-color: #494646;
-    box-shadow: #000000 0 0 0.75rem;
     margin: auto;
     align-items: center;
-    width: 20rem;
+    width: 22rem;
     display: flex;
     flex-direction: column;
+    margin-bottom: 2rem;
   }
 
   #footer {
