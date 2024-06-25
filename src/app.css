@@ -1,6 +1,6 @@
 body {
     --text: #0e110f;
-    --background: #f0f4f1;
+    --background: #e1ebe3;
     --primary: #38513e;
     --secondary: #a2c3aa;
     --accent: #4d845d;
@@ -12,15 +12,14 @@ body {
     color: var(--text);
     background-color: var(--background);
     text-align: center;
-    margin-left: calc(100vw - 100%)
 }
 
 @media (prefers-color-scheme: dark) {
     body {
         --text: #eef1ef;
         --background: #0b0f0c;
-        --primary: #aec7b4;
-        --secondary: #3c5d44;
+        --primary: #68816e;
+        --secondary: #314b38;
         --accent: #7bb28b;
     }
 }
