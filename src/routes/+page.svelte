@@ -73,7 +73,7 @@
     bottom: 0;
     width: 100%;
     height: 3rem;
-    background-color: rgb(49, 45, 45);
+    background-color: var(--primary);
     align-items: center;
     justify-content: center;
     display: flex;
@@ -93,6 +93,7 @@
     user-select: none;
     -webkit-user-select: none;
     -webkit-user-drag: none;
+    fill: var(--text);
   }
   #create-entry-button:hover {
     filter: invert(1);

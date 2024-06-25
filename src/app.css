@@ -1,15 +1,25 @@
 body {
-    --text: #eee8e7;
-    --background: #140c0a;
-    --primary: #dba395;
-    --secondary: #913621;
-    --accent: #e44825;
+    --text: #090806;
+    --background: #faf9f5;
+    --primary: #b89b56;
+    --secondary: #ddc997;
+    --accent: #dbb866;
 
     font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
     font-size: 16px;
     line-height: 24px;
     font-weight: 400;
-    color: white;
-    background-color: #494646;
+    color: var(--text);
+    background-color: var(--background);
     text-align: center;
+}
+
+@media (prefers-color-scheme: dark) {
+    body {
+        --text: #f9f8f6;
+        --background: #0a0905;
+        --primary: #a98c47;
+        --secondary: #685422;
+        --accent: #997624;        
+    }
 }
