@@ -17,12 +17,12 @@
       {#if contentPiece.type === "text"}<p class="content-preview-element">{contentPiece.text}</p>{/if}
       {#if contentPiece.type === "video"}
         <video controls class="content-preview-element">
-          <source src={contentPiece.path} type="video/mp4">
+          <source src={contentPiece.path}>
         </video>
       {/if}
       {#if contentPiece.type === "audio"}
         <audio controls class="content-preview-element">
-          <source src={contentPiece.path} type="audio/mpeg">
+          <source src={contentPiece.path}>
         </audio>
       {/if}
     {/each}
@@ -31,10 +31,11 @@
 
 <style>
   .entry {
-    background-color: #7e7e7e;
+    background-color: var(--secondary);
     padding: 0.5rem;
     margin: 0.5rem;
-    border: 3px solid rgb(51, 51, 51);
+    border: 0.25rem solid var(--primary);
+    border-radius: 1rem;
     text-align: center;
     width: auto;
     box-sizing: border-box;
@@ -43,7 +44,7 @@
     margin: 0;
     padding-bottom: 0.25rem;
     margin-bottom: 0.5rem;
-    border-bottom: 3px solid rgb(51, 51, 51);
+    border-bottom: 3px solid var(--text);
   }
   .content-preview {
     margin: 0.25rem;
@@ -53,7 +54,7 @@
     align-items: center;
     grid-template-columns: repeat(4, 1fr);
     grid-template-rows: repeat(2, 1fr);
-    gap: 0.25rem;
+    gap: 0.5rem;
   }
   .content-preview p {
     user-select: none;

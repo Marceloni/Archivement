@@ -148,7 +148,10 @@
     }
     p {margin: 0px}
     #content-pieces {
-        width: 30rem;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        max-width: 35rem;
     }
     .content-piece-element {
         width: calc(100% - 3rem);
@@ -180,7 +183,7 @@
         bottom: 0;
         width: 100%;
         height: 3rem;
-        background-color: rgb(49, 45, 45);
+        background-color: var(--secondary);
         align-items: center;
         justify-content: center;
         display: flex;
@@ -201,10 +204,12 @@
 
     .content-main-div {
         margin-top: 2rem;
-        border: solid 3px var(--secondary);
-        background-color: var(--primary);
+        border: solid 3px var(--primary);
+        background-color: var(--secondary);
         padding: 1rem;
         width: 100%;
+        border-radius: 1rem;
+        box-sizing: border-box;
     }
     .content-piece-div {
         justify-content: center;
