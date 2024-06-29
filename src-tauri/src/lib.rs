@@ -10,7 +10,7 @@ pub fn run() {
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_shell::init())
         .plugin(tauri_plugin_fs::init())
-        .invoke_handler(tauri::generate_handler![create_entry, read_entries, get_settings, change_content_piece, add_content_piece, remove_content_piece])
+        .invoke_handler(tauri::generate_handler![create_entry, read_entries, get_settings, change_content_piece, add_content_piece, remove_content_piece, change_goal_state])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
@@ -202,4 +202,20 @@ fn remove_content_piece(app: AppHandle, uuid: String, index: usize) {
             app.emit("reload_entry", uuid).unwrap();
         }
     });
+}
+
+#[tauri::command]
+fn change_goal_state(app: AppHandle, uuid: String, index: usize, completed: bool) {
+    let app_data_dir = app.path().app_data_dir().expect("failed to get app data dir");
+    let entries_dir = app_data_dir.join("entries");
+    if entries_dir.exists() {
+        let entry_dir = entries_dir.join(&uuid);
+        if entry_dir.exists() {
+            let settings_path = entry_dir.join("settings.json");
+            let mut settings_json: EntrySettings = serde_json::from_str(&std::fs::read_to_string(&settings_path).expect("failed to read entry settings")).expect("failed to deserialize entry settings");
+            settings_json.goals[index].completed = completed;
+            fs::write(settings_path, serde_json::to_string_pretty(&settings_json).expect("failed to serialize entry settings")).expect("failed to write entry settings");
+            app.emit("reload_entry", uuid).unwrap();
+        }
+    }
 }

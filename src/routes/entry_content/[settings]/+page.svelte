@@ -61,6 +61,13 @@
         invoke("remove_content_piece", {uuid: settings.uuid, index: parseInt(contentPieceDiv.dataset.index as string)})
     }
 
+    function changeGoalState(event: Event) {
+        let target = event.currentTarget as HTMLInputElement
+        let goalDiv = target.parentElement as HTMLDivElement
+        let index = parseInt(goalDiv.dataset.index as string)
+        invoke("change_goal_state", {uuid: settings.uuid, index, completed: target.checked})
+    }
+
     function toggleEditing() {editing = !editing}
     function goBack() {goto("/")}
 </script>
@@ -68,8 +75,18 @@
         <div class="icon" id="back-button" style="mask-image: url('../src/assets/icons/arrow-right-circle.svg'); -webkit-mask-image: url('../src/assets/icons/arrow-right-circle.svg');" on:click={goBack}/>
         <h1 id="entry-title">{settings.title}</h1>
         <p id="entry-description">{settings.description}</p>
-        <div class="icon" id="edit-toggle" style="mask-image: url('../src/assets/icons/edit-pen-4.svg'); -webkit-mask-image: url('../src/assets/icons/edit-pen-4.svg');" on:click={toggleEditing}/>
+
+        <div id="goals-list">
+            {#each settings.goals as goal, index}
+                <div class="goal-div" data-index={index}>
+                    <input on:change={changeGoalState} checked={goal.completed} type="checkbox">
+                    <p>{goal.title}</p>
+                </div>
+            {/each}
+        </div>
+
         <div id="content-pieces">
+            <div class="icon" id="edit-toggle" style="mask-image: url('../src/assets/icons/edit-pen-4.svg'); -webkit-mask-image: url('../src/assets/icons/edit-pen-4.svg');" on:click={toggleEditing}/>
             {#each settings.content as contentPiece, index}
                 <div class="content-main-div">
                     <div class="content-piece-div" data-index={index} data-type={contentPiece.type}>
@@ -134,6 +151,22 @@
         top: 0.5rem;
         left: 0.5rem;
     }
+    #goals-list {
+        margin-top: 2rem;
+        margin-bottom: 0.5rem;
+    }
+    .goal-div {
+        display: flex;
+        flex-direction: row;
+        margin-bottom: 1rem;
+        align-items: center;
+        position: relative;
+    }
+    .goal-div input {
+        margin-right: 1rem;
+        width: 1.5rem;
+        height: 1.5rem;
+    }
     #add-content-dropdown {
         display: none;
         background-color: var(--primary);
@@ -169,6 +202,8 @@
     }
     p {margin: 0px}
     #content-pieces {
+        border-top: 3px solid var(--accent);
+        margin-top: 1rem;
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -239,10 +274,9 @@
         border: solid 3px var(--primary);
         background-color: var(--secondary);
         padding: 1rem;
-        width: 100%;
+        width: 35rem;
         border-radius: 1rem;
         box-sizing: border-box;
-        min-width: 40rem;
     }
     .content-piece-div {
         justify-content: center;
@@ -253,7 +287,7 @@
         margin-bottom: 1rem;
     }
 
-    #content-pieces :nth-child(1){
+    #content-pieces :nth-child(2){
         margin-top: 0.5rem;
     }
   </style>
