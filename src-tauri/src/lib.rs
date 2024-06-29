@@ -9,6 +9,7 @@ pub fn run() {
     tauri::Builder::default()
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_shell::init())
+        .plugin(tauri_plugin_fs::init())
         .invoke_handler(tauri::generate_handler![create_entry, read_entries, get_settings, change_content_piece, add_content_piece, remove_content_piece])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

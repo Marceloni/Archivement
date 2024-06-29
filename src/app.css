@@ -12,6 +12,7 @@ body {
     color: var(--text);
     background-color: var(--background);
     text-align: center;
+    overflow-y: scroll
 }
 
 @media (prefers-color-scheme: dark) {
@@ -30,4 +31,4 @@ body {
     mask-repeat: no-repeat;
     mask-position: center;
     background-color: var(--text)
-}  
+} 

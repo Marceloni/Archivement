@@ -16,9 +16,12 @@
     invoke("create_entry", {title, goals: goalValues, description})
     goto("/")
   }
+  function goBack() {goto("/")}
 </script>
 
 <div id="create-entry-page">
+  <div class="icon" id="back-button" style="mask-image: url('../src/assets/icons/arrow-right-circle.svg'); -webkit-mask-image: url('../src/assets/icons/arrow-right-circle.svg');" on:click={goBack}/>
+
   <h1>Create a new Entry</h1>
   <p>You can still edit these later</p>
 
@@ -39,6 +42,17 @@
 </div>
 
 <style>
+  #back-button {
+    cursor: pointer;
+    width: 3rem;
+    height: 3rem;
+    position: absolute;
+    top: 0.5rem;
+    left: 0.5rem;
+  }
+  #back-button:hover {
+    background-color: var(--accent);
+  }
   #entry-description {
     margin-top: 0.5rem;
     font-family: inherit;
@@ -64,7 +78,8 @@
 
   #goals-list {
     padding: 0.5rem;
-    background-color: #494646;
+    background-color: var(--primary);
+    box-shadow: 0rem 0rem 1rem var(--secondary);
     margin: auto;
     align-items: center;
     width: 22rem;
@@ -79,7 +94,7 @@
     bottom: 0;
     width: 100%;
     height: 3rem;
-    background-color: rgb(49, 45, 45);
+    background-color: var(--secondary);
     align-items: center;
     justify-content: center;
     display: flex;

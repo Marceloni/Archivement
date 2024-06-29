@@ -4,8 +4,11 @@
     import {open} from "@tauri-apps/plugin-dialog"
     import { event } from "@tauri-apps/api";
     import { appDataDir, join } from "@tauri-apps/api/path";
+  import { goto } from "$app/navigation";
     /** @type {import('./$types').PageData} */
     export let data;
+    let editing = false
+
     let settings: EntrySettings = JSON.parse(data.settings)
     function revertText(e: MouseEvent) {
         let target = e.currentTarget as HTMLElement
@@ -37,7 +40,7 @@
     })
 
     window.onclick = function(event) {
-        if (!(event.target as HTMLElement).matches("#add-content-button")) {
+        if (!(event.target as HTMLElement).matches("#add-content-button, #add-content-button > *")) {
             addContentDropdownShown = false
         }
     } 
@@ -57,10 +60,15 @@
         let contentPieceDiv = target.parentElement?.parentElement as HTMLDivElement;
         invoke("remove_content_piece", {uuid: settings.uuid, index: parseInt(contentPieceDiv.dataset.index as string)})
     }
-  </script>
-  <div id="content-edit-page">
+
+    function toggleEditing() {editing = !editing}
+    function goBack() {goto("/")}
+</script>
+    <div id="content-edit-page">
+        <div class="icon" id="back-button" style="mask-image: url('../src/assets/icons/arrow-right-circle.svg'); -webkit-mask-image: url('../src/assets/icons/arrow-right-circle.svg');" on:click={goBack}/>
         <h1 id="entry-title">{settings.title}</h1>
         <p id="entry-description">{settings.description}</p>
+        <div class="icon" id="edit-toggle" style="mask-image: url('../src/assets/icons/edit-pen-4.svg'); -webkit-mask-image: url('../src/assets/icons/edit-pen-4.svg');" on:click={toggleEditing}/>
         <div id="content-pieces">
             {#each settings.content as contentPiece, index}
                 <div class="content-main-div">
@@ -69,7 +77,7 @@
                             <img src={contentPiece.path} class="content-piece-element">
                         {/if}
                         {#if contentPiece.type === "text"}
-                            <textarea class="content-piece-element">{contentPiece.text}</textarea>
+                            <textarea readonly={editing?false:true} class="content-piece-element">{contentPiece.text}</textarea>
                         {/if}
                         {#if contentPiece.type === "video"}
                             {#key contentPiece.path}
@@ -86,37 +94,50 @@
                             {/key}
                         {/if}
                         
-                        <div class="edit-buttons-div">
-                            {#if contentPiece.type != "text"}
-                                <div class="icon change-content-button" style="mask-image: url('../src/assets/icons/file.svg'); -webkit-mask-image: url('../src/assets/icons/file.svg');" on:click={changeContentButton}/>
-                            {/if}
-                            {#if contentPiece.type === "text"}
-                                <div class="icon reset-button" style="mask-image: url('../src/assets/icons/reload.svg'); -webkit-mask-image: url('../src/assets/icons/reload.svg');" on:click={revertText}/>
-                                <div class="icon reset-button" style="mask-image: url('../src/assets/icons/save.svg'); -webkit-mask-image: url('../src/assets/icons/save.svg');" on:click={changeContentButton}/>
-                            {/if}
-                            <div class="icon reset-button" style="mask-image: url('../src/assets/icons/close.svg'); -webkit-mask-image: url('../src/assets/icons/close.svg');" on:click={removeContentButton}/>
-                        </div>
+                        {#if editing}
+                            <div class="edit-buttons-div">
+                                {#if contentPiece.type != "text"}
+                                    <div class="icon change-content-button" style="mask-image: url('../src/assets/icons/file.svg'); -webkit-mask-image: url('../src/assets/icons/file.svg');" on:click={changeContentButton}/>
+                                {/if}
+                                {#if contentPiece.type === "text"}
+                                    <div class="icon reset-button" style="mask-image: url('../src/assets/icons/reload.svg'); -webkit-mask-image: url('../src/assets/icons/reload.svg');" on:click={revertText}/>
+                                    <div class="icon reset-button" style="mask-image: url('../src/assets/icons/save.svg'); -webkit-mask-image: url('../src/assets/icons/save.svg');" on:click={changeContentButton}/>
+                                {/if}
+                                <div class="icon remove-content-button" style="mask-image: url('../src/assets/icons/close.svg'); -webkit-mask-image: url('../src/assets/icons/close.svg');" on:click={removeContentButton}/>
+                            </div>
+                        {/if}
                     </div>
                     <p class="creation-date">Created: { new Date(contentPiece.creation_date*1000).toLocaleString("en-gb", {day: 'numeric', month: 'numeric', year: '2-digit', hour: '2-digit', minute: '2-digit'})} </p>
                 </div>
-          {/each}
-      </div>
-      <div id="footer">
-        <div id="add-content-button" on:click={openAddContentDropdown}>
-            <div class="icon" style="mask-image: url('../src/assets/icons/plus.svg'); -webkit-mask-image: url('../src/assets/icons/plus.svg'); height:100%"/>
+            {/each}
         </div>
-        <div id="add-content-dropdown" class={addContentDropdownShown?"show":""} on:click={addContentPiece}>
-            <p data-type="text">Text</p>
-            <p data-type="image">Image</p>
-            <p data-type="video">Video</p>
-            <p data-type="audio">Audio</p>
-          </div>
-      </div>
-  </div>
-  <style>
+        {#if editing}
+            <div id="footer">
+                <div id="add-content-button" on:click={openAddContentDropdown}>
+                    <div class="icon" style="mask-image: url('../src/assets/icons/plus.svg'); -webkit-mask-image: url('../src/assets/icons/plus.svg'); height:100%"/>
+                </div>
+                <div id="add-content-dropdown" class={addContentDropdownShown?"show":""} on:click={addContentPiece}>
+                    <p data-type="text">Text</p>
+                    <p data-type="image">Image</p>
+                    <p data-type="video">Video</p>
+                    <p data-type="audio">Audio</p>
+                </div>
+            </div>
+        {/if}
+    </div>
+<style>
+    #back-button {
+        cursor: pointer;
+        width: 3rem;
+        height: 3rem;
+        position: absolute;
+        top: 0.5rem;
+        left: 0.5rem;
+    }
     #add-content-dropdown {
         display: none;
-        background-color: rgb(110, 110, 110);
+        background-color: var(--primary);
+        box-shadow: 0rem 0rem 1rem var(--secondary);
         margin-bottom: 3.5rem;
         position: absolute;
         width: 5rem;
@@ -132,7 +153,7 @@
         display: block;
     }
     #add-content-dropdown p:hover {
-        background-color: rgb(66, 66, 66);
+        background-color: var(--accent);
     }
     .show {display:block !important;}
     #content-edit-page {
@@ -143,8 +164,8 @@
     }
     #entry-description {
         padding-bottom: 1rem;
-        border-bottom: 3px rgb(36, 36, 36) solid;
-        width: 40rem;
+        border-bottom: 3px var(--accent) solid;
+        width: 80%;
     }
     p {margin: 0px}
     #content-pieces {
@@ -161,11 +182,19 @@
         resize: none;
         height: 8rem;
     }
-    .reset-button, .change-content-button, .remove-content-button {
+    .reset-button, .change-content-button, .remove-content-button{
         width: 2rem;
         height: 2rem;
         cursor: pointer;
     }
+
+    #edit-toggle {
+        margin-top: 0.5rem;
+        width: 3rem;
+        height: 3rem;
+        cursor: pointer;
+    }
+
     .edit-buttons-div {
         margin-left: 1rem;
         display: flex;
@@ -174,6 +203,9 @@
     }
     .reset-button:hover, .change-content-button:hover, #add-content-button:hover, .remove-content-button:hover {
         filter: invert(1);
+    }
+    #edit-toggle:hover, #back-button:hover {
+        background-color: var(--accent);
     }
 
 
@@ -210,6 +242,7 @@
         width: 100%;
         border-radius: 1rem;
         box-sizing: border-box;
+        min-width: 40rem;
     }
     .content-piece-div {
         justify-content: center;
@@ -218,5 +251,9 @@
         align-items: center;
         width: 100%;
         margin-bottom: 1rem;
+    }
+
+    #content-pieces :nth-child(1){
+        margin-top: 0.5rem;
     }
   </style>

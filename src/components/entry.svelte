@@ -44,7 +44,7 @@
     margin: 0;
     padding-bottom: 0.25rem;
     margin-bottom: 0.5rem;
-    border-bottom: 3px solid var(--text);
+    border-bottom: 3px solid var(--accent);
   }
   .content-preview {
     margin: 0.25rem;
