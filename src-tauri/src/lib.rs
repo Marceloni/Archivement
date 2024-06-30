@@ -13,7 +13,7 @@ pub fn run() {
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_shell::init())
         .plugin(tauri_plugin_fs::init())
-        .invoke_handler(tauri::generate_handler![create_entry, read_entries, get_settings, change_content_piece, add_content_piece, remove_content_piece, change_goal_state, export_entries, import_entries])
+        .invoke_handler(tauri::generate_handler![create_entry, read_entries, get_settings, change_content_piece, add_content_piece, remove_content_piece, change_goal_state, export_entries, import_entries, remove_goal, change_goal_title, change_entry_title, change_entry_description])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
@@ -297,7 +297,6 @@ fn import_entries(app: AppHandle) {
                         let mut file = archive.by_index(i).unwrap();
                         let file_name = file.enclosed_name().unwrap();
                         let file_path = entries_dir.join(file_name);
-                        println!("extracting file: {}", file_path.to_str().unwrap());
                         if file.is_dir() {
                             std::fs::create_dir_all(&file_path).expect("failed to create entry dir");
                         }else {
@@ -308,6 +307,93 @@ fn import_entries(app: AppHandle) {
                     app.emit("reload_entries", {}).unwrap();
                 }
             });
+        }
+    });
+}
+
+#[tauri::command]
+fn remove_goal(app: AppHandle, uuid: String, index: usize) {
+    let app_data_dir = app.path().app_data_dir().expect("failed to get app data dir");
+    let entries_dir = app_data_dir.join("entries");
+    if entries_dir.exists() {
+        let entry_dir = entries_dir.join(&uuid);
+        if entry_dir.exists() {
+            let settings_path = entry_dir.join("settings.json");
+            let mut settings_json: EntrySettings = serde_json::from_str(&std::fs::read_to_string(&settings_path).expect("failed to read entry settings")).expect("failed to deserialize entry settings");
+            settings_json.goals.remove(index);
+            fs::write(settings_path, serde_json::to_string_pretty(&settings_json).expect("failed to serialize entry settings")).expect("failed to write entry settings");
+            app.emit("reload_entry", uuid).unwrap();
+        }
+    }
+}
+
+#[tauri::command]
+fn change_goal_title(app: AppHandle, uuid: String, index: usize, title: String) {
+    let app_data_dir = app.path().app_data_dir().expect("failed to get app data dir");
+    let entries_dir = app_data_dir.join("entries");
+    if entries_dir.exists() {
+        let entry_dir = entries_dir.join(&uuid);
+        if entry_dir.exists() {
+            let settings_path = entry_dir.join("settings.json");
+            let mut settings_json: EntrySettings = serde_json::from_str(&std::fs::read_to_string(&settings_path).expect("failed to read entry settings")).expect("failed to deserialize entry settings");
+            settings_json.goals[index].title = title;
+            fs::write(settings_path, serde_json::to_string_pretty(&settings_json).expect("failed to serialize entry settings")).expect("failed to write entry settings");
+            app.emit("reload_entry", uuid).unwrap();
+        }
+    }
+}
+
+#[tauri::command]
+fn change_entry_title(app: AppHandle, uuid: String, title: String) {
+    let app_data_dir = app.path().app_data_dir().expect("failed to get app data dir");
+    let entries_dir = app_data_dir.join("entries");
+    if entries_dir.exists() {
+        let entry_dir = entries_dir.join(&uuid);
+        if entry_dir.exists() {
+            let settings_path = entry_dir.join("settings.json");
+            let mut settings_json: EntrySettings = serde_json::from_str(&std::fs::read_to_string(&settings_path).expect("failed to read entry settings")).expect("failed to deserialize entry settings");
+            settings_json.title = title;
+            fs::write(settings_path, serde_json::to_string_pretty(&settings_json).expect("failed to serialize entry settings")).expect("failed to write entry settings");
+            app.emit("reload_entry", uuid).unwrap();
+        }
+    }
+}
+
+#[tauri::command]
+fn change_entry_description(app: AppHandle, uuid: String, description: String) {
+    let app_data_dir = app.path().app_data_dir().expect("failed to get app data dir");
+    let entries_dir = app_data_dir.join("entries");
+    if entries_dir.exists() {
+        let entry_dir = entries_dir.join(&uuid);
+        if entry_dir.exists() {
+            let settings_path = entry_dir.join("settings.json");
+            let mut settings_json: EntrySettings = serde_json::from_str(&std::fs::read_to_string(&settings_path).expect("failed to read entry settings")).expect("failed to deserialize entry settings");
+            settings_json.description = description;
+            fs::write(settings_path, serde_json::to_string_pretty(&settings_json).expect("failed to serialize entry settings")).expect("failed to write entry settings");
+            app.emit("reload_entry", uuid).unwrap();
+        }
+    }
+}
+
+#[tauri::command]
+fn delete_entry(app: AppHandle, uuid: String) {
+    DialogExt::dialog(&app)
+    .message("Are you sure you want to delete this entry? This action cannot be reverted.")
+    .cancel_button_label("Cancel")
+    .ok_button_label("Continue")
+    .title("Confirm Deletion")
+    .kind(MessageDialogKind::Info)
+    .show(move |response| {
+        if response == true {
+            let app_data_dir = app.path().app_data_dir().expect("failed to get app data dir");
+            let entries_dir = app_data_dir.join("entries");
+            if entries_dir.exists() {
+                let entry_dir = entries_dir.join(&uuid);
+                if entry_dir.exists() {
+                    fs::remove_dir_all(&entry_dir).expect("failed to remove entry dir");
+                    app.emit("reload_entries", {}).unwrap();
+                }
+            }
         }
     });
 }

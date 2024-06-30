@@ -64,6 +64,10 @@
     height: auto;
     overflow: hidden;
     text-overflow: ellipsis;
+    line-break: anywhere;
+    -webkit-line-clamp: 10;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
   }
   .content-preview img, .content-preview video {
     user-select: none;

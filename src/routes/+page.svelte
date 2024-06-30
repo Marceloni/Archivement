@@ -15,8 +15,10 @@
 
   event.listen("reload_entries", async () => {loadEntries()})
 
+  let entryList: HTMLElement
+
   async function loadEntries() {
-    (document.getElementById("entry-list") as HTMLElement).innerHTML = ""
+    entryList.innerHTML = ""
 
     let settings_files: EntrySettings[] = await invoke("read_entries")
     settings_files.forEach(async (settings) => {
@@ -25,9 +27,9 @@
           contentPiece.path = await convertFileSrc(await join(await appDataDir(), "entries", settings.uuid, "content", contentPiece.path as string))
         }
         return contentPiece
-      }));
+      }))
       
-      new Entry({target: document.getElementById("entry-list") as HTMLElement, props: {settings}})
+      new Entry({target: entryList, props: {settings}})
     })
   }
 
@@ -64,7 +66,7 @@
 
   <p>Archive your Achievements</p>
 
-  <div id="entry-list">
+  <div id="entry-list" bind:this={entryList}>
     
   </div>
 
@@ -169,6 +171,6 @@
     border-style: solid;
   }
   #create-entry-button:hover {
-    filter: invert(1);
+    background-color: var(--accent);
   }
 </style>

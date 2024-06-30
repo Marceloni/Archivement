@@ -22,7 +22,7 @@
   <h1>Create a new Entry</h1>
   <p>You can still edit these later</p>
 
-  <input id="title-input" type="text" placeholder="Enter a Title">
+  <input id="title-input" type="text" maxlength=32 placeholder="Enter a Title">
 
   <div id="goals-list">
     <GoalInput></GoalInput>
@@ -66,7 +66,7 @@
     height: 2rem;
   }
   #add-goal-button:hover {
-    filter: invert(1);
+    background-color: var(--accent);
   }
 
   #create-entry-page {

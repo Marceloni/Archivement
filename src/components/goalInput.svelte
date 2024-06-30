@@ -32,7 +32,7 @@
     height: 3rem;
   }
   .remove-goal-button:hover {
-    filter: invert(1);
+    background-color: var(--accent);
   }
 
   .goal-input {

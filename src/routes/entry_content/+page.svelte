@@ -70,23 +70,69 @@
 
     function toggleEditing() {editing = !editing}
     function goBack() {goto("/")}
+
+    function removeGoal(event: MouseEvent) {
+        let target = event.currentTarget as HTMLElement
+        let goalDiv = target.parentElement as HTMLDivElement
+        let index = parseInt(goalDiv.dataset.index as string)
+        invoke("remove_goal", {uuid: settings.uuid, index})
+    }
+    function changeGoalTitle(event: Event) {
+        let target = event.currentTarget as HTMLInputElement
+        let goalDiv = target.parentElement as HTMLDivElement
+        let index = parseInt(goalDiv.dataset.index as string)
+        invoke("change_goal_title", {uuid: settings.uuid, index, title: target.value})
+    }
+    function changeEntryTitle(event: Event) {
+        let target = event.currentTarget as HTMLInputElement
+        invoke("change_entry_title", {uuid: settings.uuid, title: target.value})
+    }
+    function changeEntryDescription(event: Event) {
+        let target = event.currentTarget as HTMLTextAreaElement
+        invoke("change_entry_description", {uuid: settings.uuid, description: target.value})
+    }
+    function deleteEntry() {
+        invoke("delete_entry", {uuid: settings.uuid})
+        goto("/")
+    }
 </script>
     <div id="content-edit-page">
         <div class="icon" id="back-button" style="mask-image: url('../src/assets/icons/arrow-right-circle.svg'); -webkit-mask-image: url('../src/assets/icons/arrow-right-circle.svg');" on:click={goBack}/>
-        <h1 id="entry-title">{settings.title}</h1>
-        <p id="entry-description">{settings.description}</p>
+        <div class="icon" id="edit-toggle" style="mask-image: url('../src/assets/icons/edit-pen-4.svg'); -webkit-mask-image: url('../src/assets/icons/edit-pen-4.svg');" on:click={deleteEntry}/>
+
+        {#if editing}
+            <div class="icon" id="delete-button" style="mask-image: url('../src/assets/icons/delete-bin.svg'); -webkit-mask-image: url('../src/assets/icons/delete-bin.svg');" on:click={toggleEditing}/>
+
+            <input maxlength=32 placeholder="Title" on:input={changeEntryTitle} id="entry-title-input" type="text" value={settings.title}>
+            <div class="entry-description-div">
+                <textarea maxlength=128 placeholder="Description" on:input={changeEntryDescription} id="entry-description-input">{settings.description}</textarea>
+            </div>
+        {:else}
+            <h1 id="entry-title">{settings.title}</h1>
+            <div class="entry-description-div">
+                <p id="entry-description">{settings.description}</p>
+            </div>
+        {/if}
 
         <div id="goals-list">
             {#each settings.goals as goal, index}
                 <div class="goal-div" data-index={index}>
-                    <input on:change={changeGoalState} checked={goal.completed} type="checkbox">
-                    <p>{goal.title}</p>
+                    <input class="goal-checkbox" on:change={changeGoalState} checked={goal.completed} type="checkbox">
+                    {#if editing}
+                        <input class="goal-input" on:input={changeGoalTitle} value={goal.title}>
+                        <div on:click={removeGoal} class="icon remove-goal-button" style="mask-image: url('../src/assets/icons/close.svg'); -webkit-mask-image: url('../src/assets/icons/close.svg');"/>
+                    {:else}
+                        {#if goal.completed}
+                            <h3 class="goal-title" style="text-decoration: line-through; text-decoration-thickness: 3px;">{goal.title}</h3>
+                        {:else}
+                            <h3 class="goal-title">{goal.title}</h3>
+                        {/if}
+                    {/if}
                 </div>
             {/each}
         </div>
 
         <div id="content-pieces">
-            <div class="icon" id="edit-toggle" style="mask-image: url('../src/assets/icons/edit-pen-4.svg'); -webkit-mask-image: url('../src/assets/icons/edit-pen-4.svg');" on:click={toggleEditing}/>
             {#each settings.content as contentPiece, index}
                 <div class="content-main-div">
                     <div class="content-piece-div" data-index={index} data-type={contentPiece.type}>
@@ -143,6 +189,34 @@
         {/if}
     </div>
 <style>
+    #entry-title-input {
+        font-size: x-large;
+        text-align: center;
+        margin-block-start: 0.67em;
+        margin-block-end: 0.67em;
+    }
+    #entry-description-input {
+        font-family: inherit;
+        resize: none;
+        width: 15rem;
+        height: 5rem;
+    }
+    .goal-title {
+        margin: 0;
+    }
+    .goal-input {
+        padding: 0.5rem;
+        width: fit-content;
+    }
+    .remove-goal-button {
+        cursor: pointer;
+        height: 100%;
+        width: 2.5rem;
+        height: 2.5rem;
+    }
+    .remove-goal-button:hover {
+        background-color: var(--accent);
+    }
     #back-button {
         cursor: pointer;
         width: 3rem;
@@ -162,7 +236,7 @@
         align-items: center;
         position: relative;
     }
-    .goal-div input {
+    .goal-checkbox {
         margin-right: 1rem;
         width: 1.5rem;
         height: 1.5rem;
@@ -196,10 +270,17 @@
         margin-bottom: 5rem;
     }
     #entry-description {
-        padding-bottom: 1rem;
-        border-bottom: 3px var(--accent) solid;
-        width: 80%;
+        width: 25rem;
+        overflow: hidden;
+        line-break: anywhere;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        line-break: anywhere;
+        -webkit-line-clamp: 5;
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
     }
+
     p {margin: 0px}
     #content-pieces {
         border-top: 3px solid var(--accent);
@@ -224,10 +305,20 @@
     }
 
     #edit-toggle {
-        margin-top: 0.5rem;
+        cursor: pointer;
         width: 3rem;
         height: 3rem;
+        position: absolute;
+        top: 0.5rem;
+        right: 0.5rem;
+    }
+    #delete-button {
         cursor: pointer;
+        width: 3rem;
+        height: 3rem;
+        position: absolute;
+        top: 0.5rem;
+        right: 4rem;
     }
 
     .edit-buttons-div {
@@ -237,12 +328,11 @@
         align-self: flex-start;
     }
     .reset-button:hover, .change-content-button:hover, #add-content-button:hover, .remove-content-button:hover {
-        filter: invert(1);
-    }
-    #edit-toggle:hover, #back-button:hover {
         background-color: var(--accent);
     }
-
+    #edit-toggle:hover, #back-button:hover, #delete-button:hover {
+        background-color: var(--accent);
+    }
 
     #footer {
         position: fixed;
