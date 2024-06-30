@@ -13,7 +13,7 @@ pub fn run() {
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_shell::init())
         .plugin(tauri_plugin_fs::init())
-        .invoke_handler(tauri::generate_handler![create_entry, read_entries, get_settings, change_content_piece, add_content_piece, remove_content_piece, change_goal_state, export_entries, import_entries, remove_goal, change_goal_title, change_entry_title, change_entry_description])
+        .invoke_handler(tauri::generate_handler![create_entry, read_entries, get_settings, change_content_piece, add_content_piece, remove_content_piece, change_goal_state, export_entries, import_entries, remove_goal, change_goal_title, change_entry_title, change_entry_description, delete_entry])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
@@ -391,7 +391,7 @@ fn delete_entry(app: AppHandle, uuid: String) {
                 let entry_dir = entries_dir.join(&uuid);
                 if entry_dir.exists() {
                     fs::remove_dir_all(&entry_dir).expect("failed to remove entry dir");
-                    app.emit("reload_entries", {}).unwrap();
+                    app.emit("entry_deleted", {}).unwrap();
                 }
             }
         }

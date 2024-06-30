@@ -93,15 +93,16 @@
     }
     function deleteEntry() {
         invoke("delete_entry", {uuid: settings.uuid})
-        goto("/")
     }
+
+    event.listen("entry_deleted", () => {goto("/")})
 </script>
     <div id="content-edit-page">
         <div class="icon" id="back-button" style="mask-image: url('../src/assets/icons/arrow-right-circle.svg'); -webkit-mask-image: url('../src/assets/icons/arrow-right-circle.svg');" on:click={goBack}/>
-        <div class="icon" id="edit-toggle" style="mask-image: url('../src/assets/icons/edit-pen-4.svg'); -webkit-mask-image: url('../src/assets/icons/edit-pen-4.svg');" on:click={deleteEntry}/>
+        <div class="icon" id="edit-toggle" style="mask-image: url('../src/assets/icons/edit-pen-4.svg'); -webkit-mask-image: url('../src/assets/icons/edit-pen-4.svg');" on:click={toggleEditing}/>
 
         {#if editing}
-            <div class="icon" id="delete-button" style="mask-image: url('../src/assets/icons/delete-bin.svg'); -webkit-mask-image: url('../src/assets/icons/delete-bin.svg');" on:click={toggleEditing}/>
+            <div class="icon" id="delete-button" style="mask-image: url('../src/assets/icons/delete-bin.svg'); -webkit-mask-image: url('../src/assets/icons/delete-bin.svg');" on:click={deleteEntry}/>
 
             <input maxlength=32 placeholder="Title" on:input={changeEntryTitle} id="entry-title-input" type="text" value={settings.title}>
             <div class="entry-description-div">
