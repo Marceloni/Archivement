@@ -24,10 +24,39 @@
     })
   })
   
+
+
+
+  let menuDropdownShown = false
+  window.onclick = function(event) {
+    if (!(event.target as HTMLElement).matches("#menu-button")) {
+      menuDropdownShown = false
+    }
+  } 
+  function openMenuDropdown() {
+    menuDropdownShown =! menuDropdownShown
+  }
+  function menuAction(event: MouseEvent) {
+    switch ((event.target as HTMLElement).dataset.action) {
+      case "import":
+        invoke("import_entries")
+        break;
+      case "export":
+        invoke("export_entries")
+        break;
+    }
+  }
 </script>
 
 <div id="home-page">
-  <h1>Welcome to Archivement</h1>
+  <div id="top-div">
+    <h1>Welcome to Archivement</h1>
+    <div on:click={openMenuDropdown} class="icon" id="menu-button" style="mask-image: url('src/assets/icons/menu.svg'); -webkit-mask-image: url('src/assets/icons/menu.svg');"/>
+    <div id="menu-dropdown" class={menuDropdownShown?"show":""} on:click={menuAction}>
+      <p data-action="import">Import</p>
+      <p data-action="export">Export</p>
+  </div>
+  </div>
 
   <p>Archive your Achievements</p>
 
@@ -43,6 +72,48 @@
 </div>
 
 <style>
+  #menu-dropdown {
+    display: none;
+    background-color: var(--primary);
+    box-shadow: 0rem 0rem 1rem var(--secondary);
+    position: absolute;
+    width: 5rem;
+    z-index: 1;
+    top: 4rem;
+    right: 1rem;
+    align-self: start;
+  }
+  #menu-dropdown p {
+    cursor: pointer;
+    color: inherit;
+    padding: 0.5rem 0.5rem;
+    text-decoration: none;
+    margin: 0;
+  }
+  #menu-dropdown p:hover {
+    background-color: var(--accent);
+  }
+  .show {
+    display: block !important;
+  }
+  #top-div {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+  }
+  #menu-button {
+    width: 3rem;
+    height: 3rem;
+    margin-left: auto;
+  }
+  #menu-button:hover {
+    cursor: pointer;
+    background-color: var(--accent);
+  }
+  #top-div h1 {
+    width: 100%;
+    padding-left: 3rem;
+  }
   #home-page {
     margin-bottom: 5rem;
   }

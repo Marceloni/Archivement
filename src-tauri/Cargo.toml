@@ -22,3 +22,6 @@ uuid = { version = "1.8.0", features = ["v4"] }
 tauri-plugin-dialog = "2.0.0-beta"
 tauri-plugin-shell = "2.0.0-beta"
 tauri-plugin-fs = "2.0.0-beta"
+zip = { version = "2.1.3", features = ["deflate"] }
+walkdir = "2.5.0"
+chrono = "0.4.38"

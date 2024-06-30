@@ -1,8 +1,11 @@
-use std::{fs, path::PathBuf, time::{SystemTime, UNIX_EPOCH}};
+use std::{fs::{self, File}, io::{Read, Write}, path::PathBuf, time::{SystemTime, UNIX_EPOCH}};
 
+use chrono::Local;
 use tauri::{AppHandle, Manager};
 use tauri_plugin_dialog::{DialogExt, MessageDialogKind};
 use uuid::Uuid;
+use walkdir::WalkDir;
+use zip::write::{FileOptionExtension, FileOptions, SimpleFileOptions};
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -10,7 +13,7 @@ pub fn run() {
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_shell::init())
         .plugin(tauri_plugin_fs::init())
-        .invoke_handler(tauri::generate_handler![create_entry, read_entries, get_settings, change_content_piece, add_content_piece, remove_content_piece, change_goal_state])
+        .invoke_handler(tauri::generate_handler![create_entry, read_entries, get_settings, change_content_piece, add_content_piece, remove_content_piece, change_goal_state, export_entries, import_entries])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
@@ -218,4 +221,82 @@ fn change_goal_state(app: AppHandle, uuid: String, index: usize, completed: bool
             app.emit("reload_entry", uuid).unwrap();
         }
     }
+}
+
+
+#[tauri::command]
+fn export_entries(app: AppHandle) {
+    println!("exporting entries");
+    let app_data_dir = app.path().app_data_dir().expect("failed to get app data dir");
+    let entries_dir = app_data_dir.join("entries");
+    let file_name = format!("archivement_{}.zip", Local::now().format("%Y-%m-%d_%H%M%S"));
+    if entries_dir.exists() {
+        DialogExt::dialog(&app)
+        .file()
+        .set_title("Select a destination to export your entries")
+        .set_can_create_directories(true)
+        .set_file_name(file_name)
+        .save_file(move |path_result| {
+            if path_result.is_some() {
+                let zip_path = path_result.unwrap();
+                let file = File::create(&zip_path).unwrap();
+    
+                let walkdir = WalkDir::new(&entries_dir).into_iter();
+        
+                let mut zip = zip::ZipWriter::new(file);
+        
+                let options = SimpleFileOptions::default()
+                .compression_method(zip::CompressionMethod::Deflated)
+                .unix_permissions(0o755);
+
+                let mut buffer: Vec<u8> = Vec::new();
+                for entry in walkdir {
+                    let entry = entry.unwrap();
+                    let path = entry.path();
+                    let name = path.strip_prefix(&entries_dir).unwrap();
+                    if path.is_file(){
+                        zip.start_file(name.to_str().unwrap().replace("\\", "/"), options)
+                            .unwrap();
+                        let mut f = File::open(path).unwrap();
+        
+                        f.read_to_end(&mut buffer).unwrap();
+                        zip.write_all(&*buffer).unwrap();
+                        buffer.clear();
+                    } else if path.is_dir() && name.as_os_str().len() != 0 {
+                        zip.add_directory(name.to_str().unwrap().replace("\\", "/"), options).unwrap();
+                    }
+                }
+                zip.finish().unwrap();
+            }
+        })
+    }
+}
+
+#[tauri::command]
+fn import_entries(app: AppHandle) {
+    DialogExt::dialog(&app)
+    .file()
+    .add_filter("Zip Archive", &["zip"])
+    .pick_file(move |path_result| {
+        if path_result.is_some() {
+            let zip_path = path_result.unwrap().path;
+            let file = File::open(&zip_path).unwrap();
+            let mut archive = zip::ZipArchive::new(file).unwrap();
+            let app_data_dir = app.path().app_data_dir().expect("failed to get app data dir");
+            let entries_dir = app_data_dir.join("entries");
+            if !entries_dir.exists() {std::fs::create_dir_all(&entries_dir).expect("failed to create entries dir");}
+            for i in 0..archive.len() {
+                let mut file = archive.by_index(i).unwrap();
+                let file_name = file.enclosed_name().unwrap();
+                let file_path = entries_dir.join(file_name);
+                println!("extracting file: {}", file_path.to_str().unwrap());
+                if file.is_dir() {
+                    std::fs::create_dir_all(&file_path).expect("failed to create entry dir");
+                }else {
+                    let mut new_file = File::create(&file_path).unwrap();
+                    std::io::copy(&mut file, &mut new_file).unwrap();
+                }
+            }
+        }
+    });
 }
