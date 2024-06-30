@@ -6,11 +6,18 @@
   import type { EntrySettings } from "../entrySettings"
   import {convertFileSrc} from "@tauri-apps/api/core"
   import { appDataDir, join } from "@tauri-apps/api/path";
+  import { event } from "@tauri-apps/api";
   function addEntry() {
     goto("/create")
   }
 
-  onMount(async ()=>{
+  onMount(async ()=>{loadEntries()})
+
+  event.listen("reload_entries", async () => {loadEntries()})
+
+  async function loadEntries() {
+    (document.getElementById("entry-list") as HTMLElement).innerHTML = ""
+
     let settings_files: EntrySettings[] = await invoke("read_entries")
     settings_files.forEach(async (settings) => {
       settings.content = await Promise.all(settings.content.map(async (contentPiece) => {
@@ -18,14 +25,11 @@
           contentPiece.path = await convertFileSrc(await join(await appDataDir(), "entries", settings.uuid, "content", contentPiece.path as string))
         }
         return contentPiece
-      }))
+      }));
       
       new Entry({target: document.getElementById("entry-list") as HTMLElement, props: {settings}})
     })
-  })
-  
-
-
+  }
 
   let menuDropdownShown = false
   window.onclick = function(event) {

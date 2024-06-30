@@ -2,11 +2,8 @@
   import {invoke} from '@tauri-apps/api/core';
   import GoalInput from "../../components/goalInput.svelte";
   import { goto } from '$app/navigation';
-  let goals: GoalInput[] = []
   function addGoal() {
-    goals.forEach((goal) => {goal.$set({closable: false})})
-    const goalInstance = new GoalInput({target: document.getElementById("goals-list") as HTMLElement, anchor: document.getElementById("add-goal-button") as HTMLElement, props: {closable: true, onRemove: () => {goals.splice(goals.indexOf(goalInstance), 1); goals.at(-1)?.$set({closable: true})}}})
-    goals.push(goalInstance)
+    new GoalInput({target: document.getElementById("goals-list") as HTMLElement, anchor: document.getElementById("add-goal-button") as HTMLElement})
   }
   function createEntry() {
     let title = (document.getElementById("title-input") as HTMLInputElement).value

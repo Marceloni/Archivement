@@ -236,6 +236,7 @@ fn export_entries(app: AppHandle) {
         .set_title("Select a destination to export your entries")
         .set_can_create_directories(true)
         .set_file_name(file_name)
+        .add_filter("Zip Archive", &["zip"])
         .save_file(move |path_result| {
             if path_result.is_some() {
                 let zip_path = path_result.unwrap();
@@ -280,23 +281,33 @@ fn import_entries(app: AppHandle) {
     .pick_file(move |path_result| {
         if path_result.is_some() {
             let zip_path = path_result.unwrap().path;
-            let file = File::open(&zip_path).unwrap();
-            let mut archive = zip::ZipArchive::new(file).unwrap();
-            let app_data_dir = app.path().app_data_dir().expect("failed to get app data dir");
-            let entries_dir = app_data_dir.join("entries");
-            if !entries_dir.exists() {std::fs::create_dir_all(&entries_dir).expect("failed to create entries dir");}
-            for i in 0..archive.len() {
-                let mut file = archive.by_index(i).unwrap();
-                let file_name = file.enclosed_name().unwrap();
-                let file_path = entries_dir.join(file_name);
-                println!("extracting file: {}", file_path.to_str().unwrap());
-                if file.is_dir() {
-                    std::fs::create_dir_all(&file_path).expect("failed to create entry dir");
-                }else {
-                    let mut new_file = File::create(&file_path).unwrap();
-                    std::io::copy(&mut file, &mut new_file).unwrap();
+            DialogExt::dialog(&app)
+            .message("Are you sure you want to import entries? This action might overwrite existing entries.")
+            .ok_button_label("Continue")
+            .cancel_button_label("Cancel")
+            .title("Confirm Import")
+            .kind(MessageDialogKind::Warning).show(move |response| {
+                if response {
+                    let file = File::open(&zip_path).unwrap();
+                    let mut archive = zip::ZipArchive::new(file).unwrap();
+                    let app_data_dir = app.path().app_data_dir().expect("failed to get app data dir");
+                    let entries_dir = app_data_dir.join("entries");
+                    if !entries_dir.exists() {std::fs::create_dir_all(&entries_dir).expect("failed to create entries dir");}
+                    for i in 0..archive.len() {
+                        let mut file = archive.by_index(i).unwrap();
+                        let file_name = file.enclosed_name().unwrap();
+                        let file_path = entries_dir.join(file_name);
+                        println!("extracting file: {}", file_path.to_str().unwrap());
+                        if file.is_dir() {
+                            std::fs::create_dir_all(&file_path).expect("failed to create entry dir");
+                        }else {
+                            let mut new_file = File::create(&file_path).unwrap();
+                            std::io::copy(&mut file, &mut new_file).unwrap();
+                        }
+                    }
+                    app.emit("reload_entries", {}).unwrap();
                 }
-            }
+            });
         }
     });
 }

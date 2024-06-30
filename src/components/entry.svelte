@@ -5,7 +5,7 @@
   import { goto } from "$app/navigation";
 
   async function openEntry() {
-    goto("/entry_content/" + encodeURIComponent(JSON.stringify(settings)))
+    goto("/entry_content?settings=" + encodeURIComponent(JSON.stringify(settings)))
   }
 </script>
 

@@ -1,15 +1,15 @@
 <script lang="ts">
     import { convertFileSrc, invoke } from "@tauri-apps/api/core";
-    import type { EntrySettings } from "../../../entrySettings";
+    import type { EntrySettings } from "../../entrySettings";
     import {open} from "@tauri-apps/plugin-dialog"
     import { event } from "@tauri-apps/api";
     import { appDataDir, join } from "@tauri-apps/api/path";
-  import { goto } from "$app/navigation";
-    /** @type {import('./$types').PageData} */
-    export let data;
+    import { goto } from "$app/navigation";
+    import { page } from '$app/stores';
     let editing = false
 
-    let settings: EntrySettings = JSON.parse(data.settings)
+    let settings: EntrySettings = JSON.parse($page.url.searchParams.get("settings") as string)
+    
     function revertText(e: MouseEvent) {
         let target = e.currentTarget as HTMLElement
         let parentElement = target.parentElement?.parentElement as HTMLDivElement
