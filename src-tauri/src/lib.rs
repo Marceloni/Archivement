@@ -1,11 +1,11 @@
-use std::{fs::{self, File}, io::{Read, Write}, path::PathBuf, time::{SystemTime, UNIX_EPOCH}};
+use std::{fs::{self, File}, io::{Read, Write}, path::PathBuf};
 
 use chrono::Local;
 use tauri::{AppHandle, Manager};
 use tauri_plugin_dialog::{DialogExt, MessageDialogKind};
 use uuid::Uuid;
 use walkdir::WalkDir;
-use zip::write::{FileOptionExtension, FileOptions, SimpleFileOptions};
+use zip::write::SimpleFileOptions;
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
@@ -42,7 +42,7 @@ struct ContentPiece {
     r#type: String,
     path: Option<String>,
     text: Option<String>,
-    creation_date: u64
+    creation_date: i64
 }
 
 fn save_entry_settings(app: AppHandle, title: String, goals: Vec<Goal>, description: String) {
@@ -163,13 +163,13 @@ fn add_content_piece(app: AppHandle, uuid: String, r#type: String) {
                         let new_content_path = entry_dir.join("content").join(&new_file_name);
                         fs::copy(content_path, &new_content_path).expect("failed to copy content file");
 
-                        settings_json.content.push(ContentPiece {r#type, path: Some(new_file_name), text: None, creation_date: SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs()});
+                        settings_json.content.push(ContentPiece {r#type, path: Some(new_file_name), text: None, creation_date: Local::now().timestamp()});
                         fs::write(settings_path, serde_json::to_string_pretty(&settings_json).expect("failed to serialize entry settings")).expect("failed to write entry settings");
                         app.emit("reload_entry", uuid).unwrap();
                     }
                 });
             }else {
-                settings_json.content.push(ContentPiece {r#type, path: None, text: Some("".to_owned()), creation_date: SystemTime::now().duration_since(UNIX_EPOCH).unwrap().as_secs()});
+                settings_json.content.push(ContentPiece {r#type, path: None, text: Some("".to_owned()), creation_date: Local::now().timestamp()});
                 fs::write(settings_path, serde_json::to_string_pretty(&settings_json).expect("failed to serialize entry settings")).expect("failed to write entry settings");
                 app.emit("reload_entry", uuid).unwrap();
             }
